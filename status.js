@@ -65,8 +65,10 @@ async function render(index) {
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(actual.width));
     canvas.height = Math.max(1, Math.round(actual.height));
-    const context = canvas.getContext("2d", { alpha: false });
-    await page.render({ canvasContext: context, viewport: actual }).promise;
+    // Preserve an alpha-capable destination while PDF.js composites soft masks and
+    // transparency groups. Keep the normal opaque PDF page background white.
+    const context = canvas.getContext("2d", { alpha: true });
+    await page.render({ canvasContext: context, viewport: actual, background: "rgb(255,255,255)" }).promise;
     if (entry.generation !== generation) { canvas.width = canvas.height = 0; return; }
     entry.canvas.replaceWith(canvas);
     entry.canvas.width = entry.canvas.height = 0;
