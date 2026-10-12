@@ -22,6 +22,27 @@ let documentPdf, pageCount = 0, pageRatio = 101.5 / 195, current = 0;
 let frameWidth = 0, frameHeight = 0, renderGeneration = 0, activeAnimation = false;
 let pointer = null, resizeTicket = 0, wheelTime = 0;
 
+
+// Stable page-level link layer, outside the moving canvas track.
+// This ensures a native clickable target is never caught by PDF canvas
+// replacement or carousel pointer capture.
+const reptileLink = document.createElement("button");
+reptileLink.type = "button";
+reptileLink.className = "pdf-hotspot viewport-hotspot";
+reptileLink.setAttribute("aria-label", "View Australian Reptile Park profile");
+reptileLink.style.cssText = "left:64%;top:0%;width:36%;height:18%;";
+reptileLink.hidden = true;
+viewport.append(reptileLink);
+reptileLink.addEventListener("pointerdown", event => event.stopPropagation());
+reptileLink.addEventListener("pointerup", event => event.stopPropagation());
+reptileLink.addEventListener("click", event => {
+  event.stopPropagation();
+  openProfile("reptile");
+});
+function updateProfileLink() {
+  reptileLink.hidden = profileOpen || current !== 9;
+}
+
 function announce() { announcer.textContent = `Page ${current + 1} of ${pageCount}`; }
 function sizing() {
   const size = window.visualViewport;
@@ -139,6 +160,7 @@ function mount() {
     further.forEach(i => enqueueRender(i));
   });
   announce();
+  updateProfileLink();
 }
 function enqueueRender(index) {
   if (cache.get(index)?.ready || renderQueue.includes(index)) return;
@@ -161,6 +183,7 @@ function openProfile(name, updateHistory = true) {
   if (!data) return;
   activeProfile = name;
   profileOpen = true;
+  updateProfileLink();
   for (const item of Object.values(profiles)) item.element.hidden = item !== data;
   viewport.hidden = true;
   if (updateHistory) history.pushState({ profile: name }, "", data.path);
@@ -172,6 +195,7 @@ function closeProfile(updateHistory = true) {
   const data = profiles[activeProfile];
   activeProfile = null;
   profileOpen = false;
+  updateProfileLink();
   for (const item of Object.values(profiles)) item.element.hidden = true;
   viewport.hidden = false;
   current = data.page;
