@@ -102,6 +102,9 @@
     showView(expanded);
     if (!expanded) hoursDetails.open = false;
     fitGuideToViewport();
+    // Returning from an expanded schedule must always reveal the top of the
+    // guide, not retain a previous document scroll position.
+    window.scrollTo(0, 0);
     if (expanded) {
       backButton.focus({ preventScroll: true });
     } else {
