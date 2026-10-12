@@ -19,12 +19,10 @@
   const GUIDE_PATH = "/beachcomber";
   const PROFILE_PATH = "/beachcomber/australian-reptile-park";
   const FADE_OUT_MS = 150;
-  const MIN_READABLE_SCALE = 0.82;
   const isDirectProfile = () => /^\/beachcomber\/australian-reptile-park\/?$/.test(window.location.pathname);
 
   let fadeTimer = null;
   let fitFrame = null;
-  let canFitViewport = false;
 
   function showView(expanded) {
     root.dataset.view = expanded ? "expanded" : "guide";
@@ -38,52 +36,58 @@
       : "Local Finds | Beachcomber Guide";
   }
 
-  function measureGuideHeight() {
-    return page.scrollHeight;
-  }
-
   function fitGuideToViewport() {
+    // visualViewport tracks the genuinely visible mobile area as the Safari
+    // and Chrome address bars expand or collapse.
     const viewportHeight = Math.floor(
-      window.visualViewport ? window.visualViewport.height : window.innerHeight
+      window.visualViewport?.height || window.innerHeight
     );
     if (!viewportHeight) return;
 
+    // Always measure without the previous transform or image crop. Keeping
+    // the layout in natural flow lets wrapped copy influence the calculation.
     shell.classList.remove("is-viewport-fitted");
     page.style.removeProperty("--fit-scale");
     page.style.removeProperty("--photo-height");
 
-    // The logo-first profile fills the viewport through normal flex layout.
-    // If its hours list is expanded, scrolling remains available.
-    if (root.dataset.view !== "guide") {
-      canFitViewport = false;
-      return;
+    const isGuide = root.dataset.view === "guide";
+
+    // The optional seven-day timetable can grow beyond the available height.
+    // Preserve its readable rows and allow scrolling while it is opened.
+    if (!isGuide && hoursDetails.open) return;
+
+    const availableHeight = Math.max(1, viewportHeight - 2);
+
+    if (isGuide) {
+      const naturalHeight = page.scrollHeight;
+      const overflow = Math.max(0, naturalHeight - availableHeight);
+
+      if (overflow > 0 && window.innerWidth <= 610) {
+        // First reduce the height of BOTH guide photos instead of shrinking
+        // all the typography. Do not distort images: object-fit crops them.
+        const currentPhotoHeight = photo.getBoundingClientRect().height;
+        const minimumPhotoHeight = Math.min(112, currentPhotoHeight * 0.58);
+        const cropPerPhoto = Math.min(
+          overflow / 2,
+          Math.max(0, currentPhotoHeight - minimumPhotoHeight)
+        );
+        if (cropPerPhoto > 0.5) {
+          page.style.setProperty(
+            "--photo-height",
+            Math.round(currentPhotoHeight - cropPerPhoto) + "px"
+          );
+        }
+      }
     }
 
-    // Only the illustrated, printed-style guide needs image cropping/scaling.
-    // Keep the profile at full readable size, independent of this adjustment.
-    const naturalHeight = measureGuideHeight();
-    if (window.innerWidth <= 610 && naturalHeight > viewportHeight) {
-      const photoHeight = photo.getBoundingClientRect().height;
-      const targetReduction = Math.min(
-        photoHeight * 0.22,
-        Math.max(0, (naturalHeight - viewportHeight) / 2)
-      );
-      page.style.setProperty(
-        "--photo-height",
-        Math.max(128, Math.round(photoHeight - targetReduction)) + "px"
-      );
-    }
-
-    const requiredHeight = measureGuideHeight();
-    const scale = Math.min(1, viewportHeight / Math.max(requiredHeight, 1));
-    canFitViewport = scale >= MIN_READABLE_SCALE;
-
-    if (canFitViewport) {
-      page.style.setProperty("--fit-scale", String(scale));
-      shell.style.setProperty("--viewport-height", viewportHeight + "px");
-      shell.classList.add("is-viewport-fitted");
-    }
-    // On short phones or larger accessibility text, allow normal scrolling.
+    // Finally fit the complete page, including the last contact line and
+    // safe-area padding. No minimum scale cutoff: even shorter displays
+    // should never hide the second business below the fold.
+    const measuredHeight = Math.max(page.scrollHeight, 1);
+    const scale = Math.min(1, availableHeight / measuredHeight);
+    page.style.setProperty("--fit-scale", String(scale));
+    shell.style.setProperty("--viewport-height", viewportHeight + "px");
+    shell.classList.add("is-viewport-fitted");
   }
 
   function scheduleFit() {
@@ -151,12 +155,10 @@
   if (window.visualViewport) {
     window.visualViewport.addEventListener("resize", scheduleFit);
   }
-  hoursDetails.addEventListener("toggle", () => {
-    // In the profile, opening the complete week must never clip its rows.
-    if (root.dataset.view === "expanded") {
-      shell.classList.remove("is-viewport-fitted");
-    }
-  });
+  hoursDetails.addEventListener("toggle", scheduleFit);
+  window.addEventListener("pageshow", scheduleFit);
+  window.addEventListener("load", scheduleFit);
+  if (document.fonts) document.fonts.ready.then(scheduleFit);
 
   const sydneyClock = new Intl.DateTimeFormat("en-AU", {
     timeZone: "Australia/Sydney",
