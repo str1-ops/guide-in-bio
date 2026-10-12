@@ -6,7 +6,6 @@
   --ink: #101010;
   --muted: #574e43;
   --line: #cbb7a0;
-  --duration: 300ms;
 }
 
 * { box-sizing: border-box; }
