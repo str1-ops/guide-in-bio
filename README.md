@@ -22,18 +22,10 @@ The HTML robots tag and the Vercel `X-Robots-Tag` header both request `noindex` 
 - Small devices can scroll naturally; the design targets 390 x 844 and 393 x 852 viewports. The social icons are centred horizontally and vertically within the available space below the action buttons.
 - External links to the park's official ticket page, website, Instagram, Facebook, Google Maps and telephone are direct.
 
-## Photo and license
+## Hero image
 
-The hero is an authentic photo taken at Australian Reptile Park, sourced from Wikimedia Commons:
+The prototype uses the Google-hosted thumbnail URL provided for the hero image:
 
-- **Photographer:** [Thebenjaminhuynh](https://commons.wikimedia.org/wiki/File:Sleeping_Koala_in_branch_fork.jpg).
-- **License:** [Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
-- **Modification:** Cropped visually in the browser using `object-fit: cover`, with no alteration to the source file.
-- **Delivery:** Loaded as a pre-sized Wikimedia thumbnail from Wikimedia's image CDN. No credit is displayed beneath the image. Attribution is documented here and in HTML metadata and the image tooltip.
-- The image and any adaptations remain subject to the linked image license. This credit does not assert that the photographer endorses Strictons or the venue.
+https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfMo6lhRBYHfJcayi_4ZVGM5RNMpnz98tRyBPAI_n_gg&s=10
 
-For production, ideally replace the image with an approved, properly licensed venue photograph optimized and hosted on Strictons infrastructure. A locally hosted asset would also remove the current third-party image dependency.
-
-## Photo attribution note
-
-The existing Commons photograph is CC BY-SA 4.0 and requires attribution. The photo credit has been removed from the *visible page layout* for the prototype, but full attribution is retained in this public README, and author and license metadata are present in the HTML. Before publishing commercially, obtain a venue-approved image with permission for attribution-free presentation, or implement a clearly accessible credit that satisfies the image licence.
+This image is externally hosted, and its resolution, continued availability, copyright holder and reuse permissions have not been verified. For production, obtain the original high-resolution image with permission to use it, then host an optimized copy on the project's own image CDN. The previous Wikimedia image and its specific licence and photographer metadata have been removed from the page.
