@@ -130,3 +130,23 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
   .page-jump { gap: 4px; }
   .page-jump label { display: none; }
 }
+
+/* Business profiles share the guide's revealable bottom control area. */
+#publication.controls-open .profile { bottom: 80px; }
+.profile-controls[hidden] { display: none !important; }
+.guide-return {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 44px;
+  border: 0;
+  padding: 0 16px;
+  background: transparent;
+  color: #fdf4e1;
+  font: 400 15px Georgia, "Times New Roman", serif;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.guide-return span:first-child { font: 30px/1 Georgia, serif; }
+.guide-return:focus-visible { outline: 2px solid #fdf4e1; outline-offset: 2px; }
