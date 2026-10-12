@@ -7,9 +7,11 @@ const root = document.getElementById("publication");
 const viewport = document.getElementById("viewport");
 const track = document.getElementById("track");
 const announcer = document.getElementById("announcer");
-const profile = document.getElementById("beachie-profile");
-const back = document.getElementById("profile-back");
-const PROFILE_PATH = "/beachcomber/the-beachie";
+const profiles = {
+  beachie: { element: document.getElementById("beachie-profile"), path: "/beachcomber/the-beachie", page: 3, title: "The Beachie Bar & Bistro" },
+  reptile: { element: document.getElementById("reptile-profile"), path: "/beachcomber/australian-reptile-park", page: 9, title: "Australian Reptile Park" }
+};
+let activeProfile = null;
 let profileOpen = false;
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const cache = new Map();
@@ -50,14 +52,15 @@ function sheetFor(index) {
     element.append(canvas);
     // Approximate the printed "View >" pill on PDF page 4.
     // Coordinates are percentages of the page; nothing is added to the PDF.
-    if (index === 3) {
+    if (index === 3 || index === 9) {
       const hotspot = document.createElement("button");
       hotspot.type = "button";
       hotspot.className = "pdf-hotspot";
-      hotspot.setAttribute("aria-label", "View The Beachie Bar and Bistro profile");
-      hotspot.style.cssText = "left:74%;top:58.8%;width:22%;height:6%;";
+      hotspot.setAttribute("aria-label", index === 3 ? "View The Beachie Bar and Bistro profile" : "View Australian Reptile Park profile");
+      // Page 10 contains two listings; target only the upper View pill.
+      hotspot.style.cssText = index === 3 ? "left:74%;top:58.8%;width:22%;height:6%;" : "left:74%;top:29.5%;width:22%;height:5.5%;";
       hotspot.addEventListener("pointerdown", event => event.stopPropagation());
-      hotspot.addEventListener("click", event => { event.stopPropagation(); showProfile(true); });
+      hotspot.addEventListener("click", event => { event.stopPropagation(); openProfile(index === 3 ? "beachie" : "reptile"); });
       element.append(hotspot);
     }
     entry = { element, canvas, ready: false, promise: null, generation: -1 };
@@ -153,27 +156,37 @@ async function drainRenderQueue() {
   const schedule = window.requestIdleCallback || (callback => setTimeout(callback, 40));
   schedule(drainRenderQueue, { timeout: 250 });
 }
-function showProfile(open, updateHistory = true) {
-  if (profileOpen === open) return;
-  profileOpen = open;
-  profile.hidden = !open;
-  viewport.hidden = open;
-  if (open) {
-    if (updateHistory) history.pushState({ profile: "beachie" }, "", PROFILE_PATH);
-    document.title = "The Beachie Bar & Bistro | Beachcomber Guide";
-    back.focus({ preventScroll: true });
-  } else {
-    if (updateHistory) history.pushState({ page: 4 }, "", "/beachcomber");
-    current = 3;
-    document.title = "Beachcomber | Your Pocket Guide";
-    mount();
-    viewport.focus?.({ preventScroll: true });
-  }
+function openProfile(name, updateHistory = true) {
+  const data = profiles[name];
+  if (!data) return;
+  activeProfile = name;
+  profileOpen = true;
+  for (const item of Object.values(profiles)) item.element.hidden = item !== data;
+  viewport.hidden = true;
+  if (updateHistory) history.pushState({ profile: name }, "", data.path);
+  document.title = data.title + " | Beachcomber Guide";
+  data.element.querySelector(".profile-back").focus({ preventScroll: true });
 }
-back.addEventListener("click", () => showProfile(false));
+function closeProfile(updateHistory = true) {
+  if (!activeProfile) return;
+  const data = profiles[activeProfile];
+  activeProfile = null;
+  profileOpen = false;
+  for (const item of Object.values(profiles)) item.element.hidden = true;
+  viewport.hidden = false;
+  current = data.page;
+  if (updateHistory) history.pushState({ page: current + 1 }, "", "/beachcomber");
+  document.title = "Beachcomber | Your Pocket Guide";
+  mount();
+}
+document.querySelectorAll(".profile-back").forEach(button => button.addEventListener("click", () => closeProfile()));
 window.addEventListener("popstate", () => {
-  const direct = location.pathname.replace(/\/$/, "") === PROFILE_PATH;
-  showProfile(direct, false);
+  const found = Object.entries(profiles).find(([, data]) => data.path === location.pathname.replace(/\\/$/, ""));
+  if (found) {
+    if (activeProfile !== found[0]) openProfile(found[0], false);
+  } else {
+    closeProfile(false);
+  }
 });
 function animateTo(target) {
   if (profileOpen || activeAnimation || !documentPdf || target < 0 || target >= pageCount || target === current) return;
@@ -282,10 +295,11 @@ document.addEventListener("touchmove", event => { if (event.cancelable) event.pr
     const size = first.getViewport({ scale: 1 });
     pageRatio = size.width / size.height;
     sizing();
-    if (location.pathname.replace(/\/$/, "") === PROFILE_PATH) {
-      current = 3;
+    const direct = Object.entries(profiles).find(([, data]) => data.path === location.pathname.replace(/\\/$/, ""));
+    if (direct) {
+      current = direct[1].page;
       mount();
-      showProfile(true, false);
+      openProfile(direct[0], false);
     }
     // Mount immediately: the first page is rendered without waiting on other pages.
     mount();
