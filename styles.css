@@ -156,8 +156,8 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 
 /* Uploaded brand marks replace the provisional typographic logos. */
 .business-logo-frame {
-  width: 76%;
-  height: calc(var(--page-height) * .108);
+  width: 90%;
+  height: calc(var(--page-height) * .16);
   display: flex;
   justify-content: center;
   align-items: center;
