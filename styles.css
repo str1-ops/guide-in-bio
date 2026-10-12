@@ -138,15 +138,17 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  min-height: 44px;
-  border: 0;
-  padding: 0 16px;
-  background: transparent;
-  color: #fdf4e1;
-  font: 400 15px Georgia, "Times New Roman", serif;
+  gap: 10px;
+  height: 40px;
+  min-height: 40px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0 12px;
+  background: #171717;
+  color: #fff;
+  font: 400 14px Arial, sans-serif;
   cursor: pointer;
   touch-action: manipulation;
 }
-.guide-return span:first-child { font: 30px/1 Georgia, serif; }
+.guide-return span:first-child { font: 26px/1 Georgia, serif; }
 .guide-return:focus-visible { outline: 2px solid #fdf4e1; outline-offset: 2px; }
