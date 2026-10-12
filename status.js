@@ -8,6 +8,14 @@ const root = document.getElementById("publication");
 const viewport = document.getElementById("viewport");
 const track = document.getElementById("track");
 const announcer = document.getElementById("announcer");
+const controls = document.getElementById("page-controls");
+const prevButton = document.getElementById("page-prev");
+const nextButton = document.getElementById("page-next");
+const closeButton = document.getElementById("page-close");
+const jumpForm = document.getElementById("page-jump");
+const pageInput = document.getElementById("page-number");
+let controlsOpen = false;
+const CONTROL_HEIGHT = 80;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 const profiles = {
   beachie: { element: document.getElementById("beachie-profile"), path: "/beachcomber/the-beachie", page: 3, title: "The Beachie Bar & Bistro" },
@@ -23,8 +31,10 @@ function fit() {
   const view = window.visualViewport;
   const width = view?.width || innerWidth;
   const height = view?.height || innerHeight;
-  frameWidth = Math.min(width, height * ratio);
+  const availableHeight = Math.max(1, height - (controlsOpen && !activeProfile ? CONTROL_HEIGHT : 0));
+  frameWidth = Math.min(width, availableHeight * ratio);
   frameHeight = frameWidth / ratio;
+  root.classList.toggle("controls-open", controlsOpen && !activeProfile);
   root.style.width = width + "px";
   root.style.height = height + "px";
   root.style.left = (view?.offsetLeft || 0) + "px";
@@ -65,6 +75,9 @@ function mount() {
   track.style.transform = "translate3d(0,0,0)";
   updateHotspots();
   announcer.textContent = "Page " + (current + 1) + " of " + urls.length;
+  pageInput.value = current + 1;
+  prevButton.disabled = current === 0;
+  nextButton.disabled = current === urls.length - 1;
   // Load one more image forward after the displayed images have been requested.
   const ahead = current + 2;
   if (ahead < urls.length) {
@@ -73,10 +86,44 @@ function mount() {
     else setTimeout(preload, 200);
   }
 }
+function setControls(open) {
+  if (activeProfile || controlsOpen === open) return;
+  controlsOpen = open;
+  controls.hidden = !open;
+  fit();
+  mount();
+}
+closeButton.addEventListener("click", () => setControls(false));
+prevButton.addEventListener("click", () => goToPage(current - 1));
+nextButton.addEventListener("click", () => goToPage(current + 1));
+jumpForm.addEventListener("submit", event => {
+  event.preventDefault();
+  const target = Number(pageInput.value);
+  if (!Number.isInteger(target) || target < 1 || target > urls.length) {
+    pageInput.setCustomValidity("Enter a page between 1 and " + urls.length);
+    pageInput.reportValidity();
+    return;
+  }
+  pageInput.setCustomValidity("");
+  pageInput.blur();
+  goToPage(target - 1);
+});
+pageInput.addEventListener("input", () => pageInput.setCustomValidity(""));
+function goToPage(index) {
+  if (activeProfile || !Number.isInteger(index) || index < 0 || index >= urls.length) return;
+  // Jump directly, without animating through intervening pages.
+  animating = false;
+  pointer = null;
+  current = index;
+  mount();
+}
 function openProfile(name, updateHistory = true) {
   const data = profiles[name];
   if (!data) return;
+  controls.hidden = true;
+  controlsOpen = false;
   activeProfile = name;
+  fit();
   Object.values(profiles).forEach(entry => { entry.element.hidden = entry !== data; });
   viewport.hidden = true;
   if (updateHistory) history.pushState({ profile: name }, "", data.path);
@@ -90,6 +137,7 @@ function closeProfile(updateHistory = true) {
   activeProfile = null;
   Object.values(profiles).forEach(entry => { entry.element.hidden = true; });
   viewport.hidden = false;
+  fit();
   if (updateHistory) history.pushState({ page: current + 1 }, "", "/beachcomber");
   document.title = "Beachcomber | Your Pocket Guide";
   mount();
@@ -189,15 +237,22 @@ viewport.addEventListener("pointermove", event => {
 viewport.addEventListener("pointerup", event => {
   if (!pointer || event.pointerId !== pointer.id) return;
   const dx = event.clientX - pointer.x;
+  const dy = event.clientY - pointer.y;
   const elapsed = Math.max(1, performance.now() - pointer.started);
   pointer = null;
+  if (Math.abs(dy) > 45 && Math.abs(dy) > Math.abs(dx) * 1.2) {
+    track.style.transition = "none";
+    track.style.transform = "translate3d(0,0,0)";
+    setControls(dy < 0);
+    return;
+  }
   if (Math.abs(dx) > Math.max(34, frameWidth * .2) || (Math.abs(dx) > 18 && Math.abs(dx / elapsed) > .55)) {
     slide(Math.max(0, Math.min(urls.length - 1, current + (dx < 0 ? 1 : -1))));
   } else slide(current);
 });
 viewport.addEventListener("pointercancel", () => { pointer = null; if (!animating) slide(current); });
 window.addEventListener("keydown", event => {
-  if (activeProfile || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+  if (activeProfile || document.activeElement === pageInput || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
   event.preventDefault();
   if (!animating) slide(Math.max(0, Math.min(urls.length - 1, current + (event.key === "ArrowRight" ? 1 : -1))));
 });
