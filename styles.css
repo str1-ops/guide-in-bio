@@ -153,3 +153,20 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 }
 .guide-return span:first-child { font: 26px/1 Georgia, serif; }
 .guide-return:focus-visible { outline: 2px solid #fdf4e1; outline-offset: 2px; }
+
+/* Uploaded brand marks replace the provisional typographic logos. */
+.business-logo-frame {
+  width: 76%;
+  height: calc(var(--page-height) * .108);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.business-logo {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
