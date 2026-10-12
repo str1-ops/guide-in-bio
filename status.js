@@ -18,9 +18,18 @@ const pageInput = document.getElementById("page-number");
 let controlsOpen = false;
 const CONTROL_HEIGHT = 80;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+// Reusable, researched profiles inserted beside the existing profile sections.
 const profiles = {
   beachie: { element: document.getElementById("beachie-profile"), path: "/beachcomber/the-beachie", page: 3, title: "The Beachie Bar & Bistro" },
-  reptile: { element: document.getElementById("reptile-profile"), path: "/beachcomber/australian-reptile-park", page: 9, title: "Australian Reptile Park" }
+  reptile: { element: document.getElementById("reptile-profile"), path: "/beachcomber/australian-reptile-park", page: 9, title: "Australian Reptile Park" },
+  caves: { element: document.getElementById("caves-profile"), path: "/beachcomber/caves-coastal", page: 5, title: "Caves Coastal Bar & Bungalows" },
+  pearl: { element: document.getElementById("pearl-profile"), path: "/beachcomber/broken-bay-pearl-farm", page: 9, title: "Broken Bay Pearl Farm" },
+  chocolate: { element: document.getElementById("chocolate-profile"), path: "/beachcomber/chocolate-factory", page: 10, title: "Chocolate Factory Gosford" },
+  aero: { element: document.getElementById("aero-profile"), path: "/beachcomber/central-coast-aero-club", page: 10, title: "Central Coast Aero Club" },
+  glenworth: { element: document.getElementById("glenworth-profile"), path: "/beachcomber/glenworth-valley", page: 11, title: "Glenworth Valley" },
+  iris: { element: document.getElementById("iris-profile"), path: "/beachcomber/iris-lodge-alpacas", page: 11, title: "Iris Lodge Alpacas" },
+  treetops: { element: document.getElementById("treetops-profile"), path: "/beachcomber/treetops-adventure", page: 12, title: "Treetops Adventure" },
+  trinity: { element: document.getElementById("trinity-profile"), path: "/beachcomber/8-at-trinity", page: 12, title: "8 at Trinity" }
 };
 const sheets = new Map();
 // Preserve the established digital guide page aspect ratio across every image.
@@ -206,15 +215,15 @@ const X_CALIBRATION_MM = 4;
 const BUSINESS_PILL_Y_OFFSET_MM = -1;
 const buttonSpecs = [
   { page: 3, name: "beachie", label: "The Beachie", xMm: 82.617, yMm: 121.334 },
-  { page: 5, label: "Caves Coastal", xMm: 82.416, yMm: 119.639 },
+  { page: 5, name: "caves", label: "Caves Coastal", xMm: 82.416, yMm: 119.639 },
   { page: 9, name: "reptile", label: "Australian Reptile Park", xMm: 82.588, yMm: 65.156 },
-  { page: 9, label: "Broken Bay Pearl Farm", xMm: 82.588, yMm: 162.58 },
-  { page: 10, label: "Chocolate Factory Gosford", xMm: 184.088, yMm: 65.156 },
-  { page: 10, label: "Central Coast Aero Club", xMm: 184.088, yMm: 162.58 },
-  { page: 11, label: "Glenworth Valley Horse Riding", xMm: 82.588, yMm: 65.156 },
-  { page: 11, label: "Iris Lodge Alpacas", xMm: 82.588, yMm: 162.58 },
-  { page: 12, label: "Treetops Adventure Park", xMm: 82.588, yMm: 65.156 },
-  { page: 12, label: "8 at Trinity", xMm: 82.588, yMm: 162.58 }
+  { page: 9, name: "pearl", label: "Broken Bay Pearl Farm", xMm: 82.588, yMm: 162.58 },
+  { page: 10, name: "chocolate", label: "Chocolate Factory Gosford", xMm: 184.088, yMm: 65.156 },
+  { page: 10, name: "aero", label: "Central Coast Aero Club", xMm: 184.088, yMm: 162.58 },
+  { page: 11, name: "glenworth", label: "Glenworth Valley Horse Riding", xMm: 82.588, yMm: 65.156 },
+  { page: 11, name: "iris", label: "Iris Lodge Alpacas", xMm: 82.588, yMm: 162.58 },
+  { page: 12, name: "treetops", label: "Treetops Adventure Park", xMm: 82.588, yMm: 65.156 },
+  { page: 12, name: "trinity", label: "8 at Trinity", xMm: 82.588, yMm: 162.58 }
 ];
 function attachPageButtons(index, sheet) {
   for (const spec of buttonSpecs.filter(item => item.page === index)) {
