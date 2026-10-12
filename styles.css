@@ -210,19 +210,24 @@ html[data-view="expanded"] .profile-view { display: flex; }
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   margin: -6px 0 0 -5px;
-  padding: 0 5px;
+  padding: 0;
   border: 0;
-  background: transparent;
-  color: var(--brown);
-  font-size: clamp(12px, 2.7vw, 14px);
-  font-weight: 700;
+  border-radius: 2px;
+  background: var(--brown);
+  color: #fff;
   cursor: pointer;
 }
 
-.back-to-guide > span { font-size: 20px; font-weight: 400; }
+.back-to-guide svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
 
 .hours-details { margin: 0 0 clamp(14px, 2.6svh, 22px); }
 
@@ -363,7 +368,7 @@ html[data-view="expanded"] .profile-view { display: flex; }
   .action-primary:hover { background: #874f39; }
   .action-secondary:hover { background: #f2e4ca; }
   .social-links a:hover { color: var(--blue); }
-  .back-to-guide:hover { color: var(--blue); }
+  .back-to-guide:hover { background: #874f39; }
 }
 
 @media (max-height: 690px) {
