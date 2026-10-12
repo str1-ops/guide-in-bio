@@ -1,13 +1,12 @@
-/* A single printed-style guide with two states, and a full-page fade. */
+/* The printed guide is one unmodified, aspect-ratio locked image. */
 (() => {
   "use strict";
 
   const root = document.documentElement;
-  const shell = document.querySelector(".guide-shell");
   const page = document.querySelector(".guide-page");
-  const photo = document.querySelector(".reptile-business .photo-wrap");
   const guideView = document.getElementById("guide-view");
-  const expandedPanel = document.getElementById("reptile-expanded");
+  const imageFrame = document.querySelector(".guide-visual");
+  const profileView = document.getElementById("reptile-expanded");
   const learnButton = document.getElementById("reptile-learn-more");
   const backButton = document.getElementById("back-to-guide");
   const hoursDetails = document.getElementById("opening-hours");
@@ -18,113 +17,73 @@
 
   const GUIDE_PATH = "/beachcomber";
   const PROFILE_PATH = "/beachcomber/australian-reptile-park";
+  const IMAGE_RATIO = 610 / 1118;
   const FADE_OUT_MS = 150;
   const isDirectProfile = () => /^\/beachcomber\/australian-reptile-park\/?$/.test(window.location.pathname);
 
   let fadeTimer = null;
-  let fitFrame = null;
+  let resizeFrame = null;
 
   function showView(expanded) {
     root.dataset.view = expanded ? "expanded" : "guide";
     guideView.inert = expanded;
-    expandedPanel.inert = !expanded;
+    profileView.inert = !expanded;
     guideView.setAttribute("aria-hidden", String(expanded));
-    expandedPanel.setAttribute("aria-hidden", String(!expanded));
+    profileView.setAttribute("aria-hidden", String(!expanded));
     learnButton.setAttribute("aria-expanded", String(expanded));
     document.title = expanded
       ? "Australian Reptile Park | Beachcomber Guide"
       : "Local Finds | Beachcomber Guide";
   }
 
-  function fitGuideToViewport() {
-    // visualViewport tracks the genuinely visible mobile area as the Safari
-    // and Chrome address bars expand or collapse.
-    const viewportHeight = Math.floor(
-      window.visualViewport?.height || window.innerHeight
+  function fitGuideImage() {
+    if (root.dataset.view !== "guide") return;
+
+    const styles = getComputedStyle(guideView);
+    const availableWidth = guideView.clientWidth
+      - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
+    const visibleHeight = Math.min(
+      guideView.clientHeight,
+      window.visualViewport?.height || guideView.clientHeight
     );
-    if (!viewportHeight) return;
+    const availableHeight = visibleHeight
+      - parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
+    const width = Math.max(1, Math.floor(Math.min(
+      610, availableWidth, availableHeight * IMAGE_RATIO
+    )));
 
-    // Always measure without the previous transform or image crop. Keeping
-    // the layout in natural flow lets wrapped copy influence the calculation.
-    shell.classList.remove("is-viewport-fitted");
-    page.style.removeProperty("--fit-scale");
-    page.style.removeProperty("--photo-height");
-
-    const isGuide = root.dataset.view === "guide";
-
-    // The optional seven-day timetable can grow beyond the available height.
-    // Preserve its readable rows and allow scrolling while it is opened.
-    if (!isGuide && hoursDetails.open) return;
-
-    const availableHeight = Math.max(1, viewportHeight - 2);
-
-    if (isGuide) {
-      const naturalHeight = page.scrollHeight;
-      const overflow = Math.max(0, naturalHeight - availableHeight);
-
-      if (overflow > 0 && window.innerWidth <= 610) {
-        // First reduce the height of BOTH guide photos instead of shrinking
-        // all the typography. Do not distort images: object-fit crops them.
-        const currentPhotoHeight = photo.getBoundingClientRect().height;
-        const minimumPhotoHeight = Math.min(112, currentPhotoHeight * 0.58);
-        const cropPerPhoto = Math.min(
-          overflow / 2,
-          Math.max(0, currentPhotoHeight - minimumPhotoHeight)
-        );
-        if (cropPerPhoto > 0.5) {
-          page.style.setProperty(
-            "--photo-height",
-            Math.round(currentPhotoHeight - cropPerPhoto) + "px"
-          );
-        }
-      }
-    }
-
-    // Finally fit the complete page, including the last contact line and
-    // safe-area padding. No minimum scale cutoff: even shorter displays
-    // should never hide the second business below the fold.
-    const measuredHeight = Math.max(page.scrollHeight, 1);
-    const scale = Math.min(1, availableHeight / measuredHeight);
-    page.style.setProperty("--fit-scale", String(scale));
-    shell.style.setProperty("--viewport-height", viewportHeight + "px");
-    shell.classList.add("is-viewport-fitted");
+    // Only the surrounding cream space changes. Image contents never reflow,
+    // stretch or crop, and both buttons remain anchored to image coordinates.
+    imageFrame.style.width = width + "px";
   }
 
   function scheduleFit() {
-    if (fitFrame !== null) window.cancelAnimationFrame(fitFrame);
-    fitFrame = window.requestAnimationFrame(() => {
-      fitFrame = null;
-      fitGuideToViewport();
+    if (resizeFrame !== null) cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(() => {
+      resizeFrame = null;
+      fitGuideImage();
     });
   }
 
   function commitView(expanded) {
     showView(expanded);
     if (!expanded) hoursDetails.open = false;
-    fitGuideToViewport();
-    // Returning from an expanded schedule must always reveal the top of the
-    // guide, not retain a previous document scroll position.
     window.scrollTo(0, 0);
-    if (expanded) {
-      backButton.focus({ preventScroll: true });
-    } else {
-      learnButton.focus({ preventScroll: true });
-    }
+    fitGuideImage();
+    (expanded ? backButton : learnButton).focus({ preventScroll: true });
   }
 
   function changeView(expanded, updateHistory = true) {
-    const currentlyExpanded = root.dataset.view === "expanded";
     if (fadeTimer !== null) {
-      window.clearTimeout(fadeTimer);
+      clearTimeout(fadeTimer);
       fadeTimer = null;
     }
-    if (expanded === currentlyExpanded) {
+    if (expanded === (root.dataset.view === "expanded")) {
       page.classList.remove("is-fading");
       return;
     }
-
     if (updateHistory) {
-      window.history.pushState({ expanded }, "", expanded ? PROFILE_PATH : GUIDE_PATH);
+      history.pushState({ expanded }, "", expanded ? PROFILE_PATH : GUIDE_PATH);
     }
 
     if (reduceMotion.matches) {
@@ -133,35 +92,26 @@
       return;
     }
 
-    // No sliding or lower-panel crossfade. The ENTIRE page fades out, its
-    // content switches while invisible, then the complete page fades in.
     page.classList.add("is-fading");
-    fadeTimer = window.setTimeout(() => {
+    fadeTimer = setTimeout(() => {
       fadeTimer = null;
       commitView(expanded);
-      window.requestAnimationFrame(() => {
-        page.classList.remove("is-fading");
-      });
+      requestAnimationFrame(() => page.classList.remove("is-fading"));
     }, FADE_OUT_MS);
   }
 
   showView(isDirectProfile());
-  fitGuideToViewport();
+  fitGuideImage();
 
   learnButton.addEventListener("click", () => changeView(true));
   backButton.addEventListener("click", () => changeView(false));
 
-  window.addEventListener("popstate", () => {
-    changeView(isDirectProfile(), false);
-  });
+  window.addEventListener("popstate", () => changeView(isDirectProfile(), false));
   window.addEventListener("resize", scheduleFit);
+  window.addEventListener("pageshow", scheduleFit);
   if (window.visualViewport) {
     window.visualViewport.addEventListener("resize", scheduleFit);
   }
-  hoursDetails.addEventListener("toggle", scheduleFit);
-  window.addEventListener("pageshow", scheduleFit);
-  window.addEventListener("load", scheduleFit);
-  if (document.fonts) document.fonts.ready.then(scheduleFit);
 
   const sydneyClock = new Intl.DateTimeFormat("en-AU", {
     timeZone: "Australia/Sydney",
