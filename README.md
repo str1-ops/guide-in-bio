@@ -31,8 +31,8 @@ Open `http://localhost:8000/` to review the guide. To test deep links by pasting
 - **Back to Guide** restores the original section without a reload.
 - Opening status is hardcoded to 9:00am to 5:00pm, seven days a week, closed Christmas Day, with the current time evaluated using `Australia/Sydney` (including daylight saving). Its expandable list displays the full week and highlights today.
 - The existing Australian Reptile Park booking, Maps, website, call, Instagram and Facebook links are preserved.
-- The initial printed guide remains responsive, with photograph cropping (up to 22%) and moderate proportional scaling on shorter screens. The compact profile independently uses a full-height flex layout with its small centred identity, readable buttons and socials filling the remaining vertical space. Extremely short screens and expanded weekly hours can scroll naturally.
-- Both states are centred in a column no wider than 610px on desktop.
+- The initial two-business guide is fitted into the visible viewport without scrolling. On short screens, its padding and spacing tighten, both photographs crop vertically as needed, and the entire guide scales proportionally for any remaining overflow. On taller screens, extra vertical space is distributed between the two businesses, with additional edge padding. The compact profile is also viewport-fitted with its hours collapsed. Very short screens may require noticeably smaller text and controls to keep everything visible.
+- Expanding all seven opening-hour rows intentionally permits scrolling rather than hiding any of the timetable or action links. Both states are centred in a column no wider than 610px on desktop.
 - Semantics include genuine buttons, labelled links, `aria-expanded`, `aria-hidden`, and `inert` on the inactive panel, with visible keyboard focus indicators.
 - Noindex metadata and response headers remain in place.
 
