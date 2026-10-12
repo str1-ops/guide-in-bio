@@ -32,3 +32,9 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 .social-icon svg { display: block; width: 100%; height: 100%; }
 .profile-back:focus-visible, .profile button:focus-visible, .profile a:focus-visible, .pdf-hotspot:focus-visible { outline: 2px solid #647f95; outline-offset: 2px; }
 .pdf-hotspot { position: absolute; z-index: 3; border: 0; background: transparent; opacity: 0; cursor: pointer; touch-action: manipulation; }
+
+/* Reptile Park profile follows the Beachie layout, with its own compact identity. */
+.reptile-profile .reptile-identity { width: 76%; height: calc(var(--page-height) * .108); display: flex; align-items: center; justify-content: center; gap: calc(var(--page-height) * .014); color: #3c624d; }
+.reptile-emblem { width: calc(var(--page-height) * .075); height: calc(var(--page-height) * .075); border: calc(var(--page-height) * .005) solid #c56c2f; border-radius: 50%; display: grid; place-items: center; color: #3c624d; font: 800 calc(var(--page-height) * .019) Arial, sans-serif; }
+.reptile-brand { font: 800 calc(var(--page-height) * .029) / 1.05 Arial, sans-serif; text-align: left; letter-spacing: -.025em; }
+.reptile-profile .profile-content h1 { font-size: calc(var(--page-height) * .025); }
