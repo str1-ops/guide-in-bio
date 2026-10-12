@@ -6,7 +6,7 @@
   const shell = document.querySelector(".guide-shell");
   const page = document.querySelector(".guide-page");
   const photo = document.querySelector(".reptile-business .photo-wrap");
-  const pearlPanel = document.getElementById("pearl-business");
+  const guideView = document.getElementById("guide-view");
   const expandedPanel = document.getElementById("reptile-expanded");
   const learnButton = document.getElementById("reptile-learn-more");
   const backButton = document.getElementById("back-to-guide");
@@ -28,9 +28,9 @@
 
   function showView(expanded) {
     root.dataset.view = expanded ? "expanded" : "guide";
-    pearlPanel.inert = expanded;
+    guideView.inert = expanded;
     expandedPanel.inert = !expanded;
-    pearlPanel.setAttribute("aria-hidden", String(expanded));
+    guideView.setAttribute("aria-hidden", String(expanded));
     expandedPanel.setAttribute("aria-hidden", String(!expanded));
     learnButton.setAttribute("aria-expanded", String(expanded));
     document.title = expanded
@@ -38,16 +38,8 @@
       : "Local Finds | Beachcomber Guide";
   }
 
-  // Measure both versions of the same page. Switching data-view here is
-  // synchronous: the browser cannot paint either temporary measurement.
-  function measurePageHeights() {
-    const originalView = root.dataset.view;
-    root.dataset.view = "guide";
-    const guideHeight = page.scrollHeight;
-    root.dataset.view = "expanded";
-    const expandedHeight = page.scrollHeight;
-    root.dataset.view = originalView;
-    return { guideHeight, expandedHeight };
+  function measureGuideHeight() {
+    return page.scrollHeight;
   }
 
   function fitGuideToViewport() {
@@ -56,25 +48,25 @@
     );
     if (!viewportHeight) return;
 
-    // Measure at natural size, then preserve the printed design's proportions
-    // by uniformly scaling the page only when necessary. On shorter phones
-    // we first trim a little photograph height to retain legible controls.
     shell.classList.remove("is-viewport-fitted");
     page.style.removeProperty("--fit-scale");
     page.style.removeProperty("--photo-height");
 
-    // The weekly hours are additional content: allow scrolling when opened.
-    // Temporarily collapse them for fitting, then restore the user's choice.
-    const hoursWereOpen = hoursDetails.open;
-    hoursDetails.open = false;
-    const natural = measurePageHeights();
-    const mostContent = Math.max(natural.guideHeight, natural.expandedHeight);
+    // The logo-first profile fills the viewport through normal flex layout.
+    // If its hours list is expanded, scrolling remains available.
+    if (root.dataset.view !== "guide") {
+      canFitViewport = false;
+      return;
+    }
 
-    if (window.innerWidth <= 610 && mostContent > viewportHeight) {
+    // Only the illustrated, printed-style guide needs image cropping/scaling.
+    // Keep the profile at full readable size, independent of this adjustment.
+    const naturalHeight = measureGuideHeight();
+    if (window.innerWidth <= 610 && naturalHeight > viewportHeight) {
       const photoHeight = photo.getBoundingClientRect().height;
       const targetReduction = Math.min(
         photoHeight * 0.22,
-        Math.max(0, (mostContent - viewportHeight) / 2)
+        Math.max(0, (naturalHeight - viewportHeight) / 2)
       );
       page.style.setProperty(
         "--photo-height",
@@ -82,22 +74,16 @@
       );
     }
 
-    const fitted = measurePageHeights();
-    const requiredHeight = Math.max(fitted.guideHeight, fitted.expandedHeight);
+    const requiredHeight = measureGuideHeight();
     const scale = Math.min(1, viewportHeight / Math.max(requiredHeight, 1));
     canFitViewport = scale >= MIN_READABLE_SCALE;
 
     if (canFitViewport) {
       page.style.setProperty("--fit-scale", String(scale));
       shell.style.setProperty("--viewport-height", viewportHeight + "px");
-    } else {
-      // Do not turn 44px controls into tiny tap targets on very short
-      // screens or under large accessibility text settings.
-      page.style.removeProperty("--fit-scale");
+      shell.classList.add("is-viewport-fitted");
     }
-
-    hoursDetails.open = hoursWereOpen;
-    shell.classList.toggle("is-viewport-fitted", canFitViewport && !hoursWereOpen);
+    // On short phones or larger accessibility text, allow normal scrolling.
   }
 
   function scheduleFit() {
@@ -166,8 +152,10 @@
     window.visualViewport.addEventListener("resize", scheduleFit);
   }
   hoursDetails.addEventListener("toggle", () => {
-    // Opening all seven rows is an intentional scrollable exception.
-    shell.classList.toggle("is-viewport-fitted", canFitViewport && !hoursDetails.open);
+    // In the profile, opening the complete week must never clip its rows.
+    if (root.dataset.view === "expanded") {
+      shell.classList.remove("is-viewport-fitted");
+    }
   });
 
   const sydneyClock = new Intl.DateTimeFormat("en-AU", {
