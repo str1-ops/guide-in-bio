@@ -1,0 +1,244 @@
+:root {
+  color-scheme: light;
+  --paper: #f6f4ef;
+  --canvas: #e9e6df;
+  --ink: #292c27;
+  --muted: #6c6c64;
+  --fine: #85867d;
+  --rule: #d8d6cf;
+  --accent: #63735e;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  min-width: 320px;
+  background: var(--canvas);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.page {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0 auto;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 15px);
+  background: var(--paper);
+}
+
+.hero {
+  flex: none;
+  min-width: 0;
+  margin: 0 18px;
+}
+
+.hero-image {
+  display: block;
+  width: 100%;
+  height: clamp(194px, 25svh, 242px);
+  object-fit: cover;
+  object-position: 50% 46%;
+  background: #d4d3c9;
+}
+
+.photo-credit {
+  margin-top: 6px;
+  color: var(--fine);
+  font-size: 9px;
+  line-height: 1.35;
+  text-align: right;
+}
+.photo-credit a {
+  text-decoration-color: #b0afa6;
+  text-underline-offset: 2px;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0 29px;
+}
+
+.intro { margin-top: clamp(21px, 3svh, 29px); }
+
+h1 {
+  max-width: 360px;
+  margin: 0;
+  font-family: "Iowan Old Style", "Baskerville", "Palatino Linotype", Georgia, serif;
+  font-size: clamp(32px, 8.85vw, 40px);
+  font-weight: 500;
+  letter-spacing: -0.047em;
+  line-height: 1.035;
+  text-wrap: balance;
+}
+
+.location {
+  margin: 11px 0 0;
+  color: #62635b;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.105em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.description {
+  max-width: 344px;
+  margin: 15px 0 0;
+  color: #5f6059;
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 1.48;
+}
+
+.opening-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 16px 0 0;
+  color: #444940;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.status-dot.is-closed { background: #929187; }
+
+.visit {
+  margin-top: clamp(22px, 4svh, 34px);
+  padding-top: clamp(17px, 2.4svh, 22px);
+  border-top: 1px solid var(--rule);
+}
+
+.primary-actions {
+  display: grid;
+  gap: 9px;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 50px;
+  padding: 0 18px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.action-primary {
+  color: #faf9f5;
+  background: var(--ink);
+}
+.action-secondary { background: transparent; }
+
+.arrow {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.extra-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(15px, 5vw, 26px);
+  min-height: 44px;
+  margin-top: clamp(10px, 1.7svh, 17px);
+}
+
+.extra-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #555950;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.012em;
+  text-decoration: none;
+}
+
+.separator {
+  width: 1px;
+  height: 12px;
+  flex: none;
+  background: #cccac1;
+}
+
+.signature {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: clamp(17px, 3svh, 28px);
+  color: #88887f;
+  text-align: center;
+}
+
+.signature span {
+  font-family: "Baskerville", Georgia, serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.19em;
+  line-height: 1.5;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .action-primary:hover { background: #464a41; }
+  .action-secondary:hover { background: #eae8e1; }
+  .extra-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
+}
+
+@media (max-height: 730px) {
+  .hero-image { height: clamp(178px, 25svh, 212px); }
+  .intro { margin-top: 21px; }
+  .visit { margin-top: 22px; }
+  .signature { padding-top: 17px; }
+}
+
+@media (min-width: 481px) {
+  .hero { margin-right: 22px; margin-left: 22px; }
+  .content { padding-right: 37px; padding-left: 37px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .action { transition: background-color 130ms ease; }
+}
