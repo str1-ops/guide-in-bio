@@ -1,167 +1,215 @@
-/* The printed guide is one unmodified, aspect-ratio locked image. */
-(() => {
-  "use strict";
+import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
 
-  const root = document.documentElement;
-  const page = document.querySelector(".guide-page");
-  const guideView = document.getElementById("guide-view");
-  const imageFrame = document.querySelector(".guide-visual");
-  const profileView = document.getElementById("reptile-expanded");
-  const learnButton = document.getElementById("reptile-learn-more");
-  const backButton = document.getElementById("back-to-guide");
-  const hoursDetails = document.getElementById("opening-hours");
-  const statusText = document.getElementById("status-text");
-  const statusDot = document.querySelector(".status-dot");
-  const dayRows = [...document.querySelectorAll("[data-day]")];
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
 
-  const GUIDE_PATH = "/beachcomber";
-  const PROFILE_PATH = "/beachcomber/australian-reptile-park";
-  const IMAGE_RATIO = 610 / 1118;
-  const FADE_OUT_MS = 150;
-  const isDirectProfile = () => /^\/beachcomber\/australian-reptile-park\/?$/.test(window.location.pathname);
+const PDF_URL = "/Beachcomber-Digital-Guide.pdf";
+const root = document.getElementById("publication");
+const viewport = document.getElementById("viewport");
+const track = document.getElementById("track");
+const announcer = document.getElementById("announcer");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const cache = new Map();
+const MAX_CACHE = 5;
+let documentPdf, pageCount = 0, pageRatio = 101.5 / 195, current = 0;
+let frameWidth = 0, frameHeight = 0, renderGeneration = 0, activeAnimation = false;
+let pointer = null, resizeTicket = 0, wheelTime = 0;
 
-  let fadeTimer = null;
-  let resizeFrame = null;
-
-  function showView(expanded) {
-    root.dataset.view = expanded ? "expanded" : "guide";
-    guideView.inert = expanded;
-    profileView.inert = !expanded;
-    guideView.setAttribute("aria-hidden", String(expanded));
-    profileView.setAttribute("aria-hidden", String(!expanded));
-    learnButton.setAttribute("aria-expanded", String(expanded));
-    document.title = expanded
-      ? "Australian Reptile Park | Beachcomber Guide"
-      : "Local Finds | Beachcomber Guide";
+function announce() { announcer.textContent = `Page ${current + 1} of ${pageCount}`; }
+function sizing() {
+  const size = window.visualViewport;
+  const width = size?.width || window.innerWidth;
+  const height = size?.height || window.innerHeight;
+  // Ignore temporary pinch-zoom scaling; the guide follows the visible area.
+  const safeWidth = Math.max(1, width);
+  const safeHeight = Math.max(1, height);
+  frameWidth = Math.min(safeWidth, safeHeight * pageRatio);
+  frameHeight = frameWidth / pageRatio;
+  viewport.style.setProperty("--page-width", `${frameWidth}px`);
+  viewport.style.setProperty("--page-height", `${frameHeight}px`);
+  // Fixed layout follows iOS's visible viewport while the browser toolbar moves.
+  root.style.width = `${safeWidth}px`;
+  root.style.height = `${safeHeight}px`;
+  root.style.left = `${size?.offsetLeft || 0}px`;
+  root.style.top = `${size?.offsetTop || 0}px`;
+}
+function sheetFor(index) {
+  let entry = cache.get(index);
+  if (!entry) {
+    const element = document.createElement("div");
+    element.className = "sheet";
+    const canvas = document.createElement("canvas");
+    element.append(canvas);
+    entry = { element, canvas, ready: false, promise: null, generation: -1 };
+    cache.set(index, entry);
   }
-
-  function fitGuideImage() {
-    if (root.dataset.view !== "guide") return;
-
-    const styles = getComputedStyle(guideView);
-    const availableWidth = guideView.clientWidth
-      - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
-    const visibleHeight = Math.min(
-      guideView.clientHeight,
-      window.visualViewport?.height || guideView.clientHeight
-    );
-    const availableHeight = visibleHeight
-      - parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
-    const width = Math.max(1, Math.floor(Math.min(
-      610, availableWidth, availableHeight * IMAGE_RATIO
-    )));
-
-    // Only the surrounding cream space changes. Image contents never reflow,
-    // stretch or crop, and both buttons remain anchored to image coordinates.
-    imageFrame.style.width = width + "px";
-  }
-
-  function scheduleFit() {
-    if (resizeFrame !== null) cancelAnimationFrame(resizeFrame);
-    resizeFrame = requestAnimationFrame(() => {
-      resizeFrame = null;
-      fitGuideImage();
-    });
-  }
-
-  function commitView(expanded) {
-    showView(expanded);
-    if (!expanded) hoursDetails.open = false;
-    window.scrollTo(0, 0);
-    fitGuideImage();
-    (expanded ? backButton : learnButton).focus({ preventScroll: true });
-  }
-
-  function changeView(expanded, updateHistory = true) {
-    if (fadeTimer !== null) {
-      clearTimeout(fadeTimer);
-      fadeTimer = null;
-    }
-    if (expanded === (root.dataset.view === "expanded")) {
-      page.classList.remove("is-fading");
-      return;
-    }
-    if (updateHistory) {
-      history.pushState({ expanded }, "", expanded ? PROFILE_PATH : GUIDE_PATH);
-    }
-
-    if (reduceMotion.matches) {
-      page.classList.remove("is-fading");
-      commitView(expanded);
-      return;
-    }
-
-    page.classList.add("is-fading");
-    fadeTimer = setTimeout(() => {
-      fadeTimer = null;
-      commitView(expanded);
-      requestAnimationFrame(() => page.classList.remove("is-fading"));
-    }, FADE_OUT_MS);
-  }
-
-  showView(isDirectProfile());
-  fitGuideImage();
-
-  learnButton.addEventListener("click", () => changeView(true));
-  backButton.addEventListener("click", () => changeView(false));
-
-  window.addEventListener("popstate", () => changeView(isDirectProfile(), false));
-  window.addEventListener("resize", scheduleFit);
-  window.addEventListener("pageshow", scheduleFit);
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", scheduleFit);
-  }
-
-  const sydneyClock = new Intl.DateTimeFormat("en-AU", {
-    timeZone: "Australia/Sydney",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
+  // Map insertion order represents most recent access.
+  cache.delete(index); cache.set(index, entry);
+  return entry;
+}
+async function render(index) {
+  if (!documentPdf || index < 0 || index >= pageCount) return;
+  const entry = sheetFor(index);
+  const generation = renderGeneration;
+  if (entry.ready && entry.generation === generation) return;
+  if (entry.promise && entry.generation === generation) return entry.promise;
+  entry.generation = generation;
+  const task = (async () => {
+    const page = await documentPdf.getPage(index + 1);
+    if (entry.generation !== generation) return;
+    const original = page.getViewport({ scale: 1 });
+    const dpr = Math.min(devicePixelRatio || 1, 2.5);
+    const desired = Math.min(frameWidth / original.width * dpr, frameHeight / original.height * dpr);
+    const maxPixels = 6000000;
+    const pixelScale = Math.min(desired, Math.sqrt(maxPixels / (original.width * original.height)));
+    const actual = page.getViewport({ scale: Math.max(0.01, pixelScale) });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(actual.width));
+    canvas.height = Math.max(1, Math.round(actual.height));
+    const context = canvas.getContext("2d", { alpha: false });
+    await page.render({ canvasContext: context, viewport: actual }).promise;
+    if (entry.generation !== generation) { canvas.width = canvas.height = 0; return; }
+    entry.canvas.replaceWith(canvas);
+    entry.canvas.width = entry.canvas.height = 0;
+    entry.canvas = canvas;
+    entry.ready = true;
+    page.cleanup();
+  })().catch(error => { console.error("PDF page rendering failed", index + 1, error); }).finally(() => {
+    if (entry.promise === task) entry.promise = null;
   });
-
-  const sydneyWeekday = new Intl.DateTimeFormat("en-AU", {
-    timeZone: "Australia/Sydney",
-    weekday: "long",
-  });
-
-  function updateOpeningStatus() {
-    const now = new Date();
-    const parts = Object.fromEntries(
-      sydneyClock.formatToParts(now)
-        .filter((part) => part.type !== "literal")
-        .map((part) => [part.type, Number(part.value)])
-    );
-
-    const minutes = parts.hour * 60 + parts.minute;
-    const isChristmas = parts.month === 12 && parts.day === 25;
-    const isOpen = !isChristmas && minutes >= 9 * 60 && minutes < 17 * 60;
-
-    if (isOpen) {
-      statusText.textContent = "Open now · Closes 5:00pm";
-    } else if (isChristmas) {
-      statusText.textContent = "Closed for Christmas · Opens 9:00am tomorrow";
-    } else if (minutes < 9 * 60) {
-      statusText.textContent = "Closed · Opens 9:00am";
-    } else if (parts.month === 12 && parts.day === 24) {
-      statusText.textContent = "Closed · Opens 9:00am on 26 Dec";
-    } else {
-      statusText.textContent = "Closed · Opens 9:00am tomorrow";
-    }
-
-    statusDot.classList.toggle("is-closed", !isOpen);
-    const today = sydneyWeekday.format(now);
-    dayRows.forEach((row) => {
-      row.classList.toggle("is-today", row.dataset.day === today);
-    });
+  entry.promise = task;
+  return task;
+}
+function position(offset = 0) {
+  track.style.transition = "none";
+  track.style.transform = `translate3d(${offset}px,0,0)`;
+}
+function mount() {
+  if (!documentPdf) return;
+  const keep = new Set([current - 1, current, current + 1].filter(i => i >= 0 && i < pageCount));
+  for (const [index, entry] of cache) {
+    if (!keep.has(index)) entry.element.remove();
   }
-
-  updateOpeningStatus();
-  window.setInterval(updateOpeningStatus, 60 * 1000);
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) updateOpeningStatus();
+  for (const index of [...keep]) {
+    const entry = sheetFor(index);
+    entry.element.style.left = `${(index - current) * frameWidth}px`;
+    if (entry.element.parentElement !== track) track.append(entry.element);
+  }
+  position();
+  for (const [index, entry] of cache) {
+    if (!keep.has(index) && cache.size > MAX_CACHE) {
+      entry.element.remove();
+      entry.canvas.width = entry.canvas.height = 0;
+      cache.delete(index);
+    }
+  }
+  // Current page renders first. Neighbours render in the background.
+  render(current).then(() => {
+    if (current > 0) render(current - 1);
+    if (current < pageCount - 1) render(current + 1);
   });
+  announce();
+}
+function animateTo(target) {
+  if (activeAnimation || !documentPdf || target < 0 || target >= pageCount || target === current) return;
+  activeAnimation = true;
+  const direction = target - current;
+  const finish = () => {
+    current = target;
+    activeAnimation = false;
+    mount();
+  };
+  if (reduceMotion.matches) { finish(); return; }
+  track.style.transition = "transform 300ms cubic-bezier(.2,.78,.24,1)";
+  track.style.transform = `translate3d(${-direction * frameWidth}px,0,0)`;
+  track.addEventListener("transitionend", finish, { once: true });
+  // Transition-end fallback for browser interruptions.
+  setTimeout(() => { if (activeAnimation) { track.removeEventListener("transitionend", finish); finish(); } }, 380);
+}
+function settle(shift, next) {
+  if (activeAnimation) return;
+  activeAnimation = true;
+  const finish = () => {
+    if (next !== current) current = next;
+    activeAnimation = false; mount();
+  };
+  if (reduceMotion.matches) { finish(); return; }
+  track.style.transition = "transform 280ms cubic-bezier(.2,.78,.24,1)";
+  track.style.transform = `translate3d(${shift}px,0,0)`;
+  track.addEventListener("transitionend", finish, { once: true });
+  setTimeout(() => { if (activeAnimation) { track.removeEventListener("transitionend", finish); finish(); } }, 350);
+}
+viewport.addEventListener("pointerdown", event => {
+  if (!documentPdf || activeAnimation || pointer || (event.pointerType === "mouse" && event.button !== 0)) return;
+  pointer = { id: event.pointerId, startX: event.clientX, startY: event.clientY, startTime: performance.now(), dx: 0 };
+  viewport.setPointerCapture(event.pointerId);
+});
+viewport.addEventListener("pointermove", event => {
+  if (!pointer || event.pointerId !== pointer.id) return;
+  let dx = event.clientX - pointer.startX;
+  if (current === 0) dx = Math.min(0, dx);
+  if (current === pageCount - 1) dx = Math.max(0, dx);
+  pointer.dx = dx;
+  position(dx);
+});
+function endPointer(event) {
+  if (!pointer || pointer.id !== event.pointerId) return;
+  const { dx, startTime } = pointer;
+  pointer = null;
+  const duration = Math.max(performance.now() - startTime, 1);
+  const enough = Math.abs(dx) > Math.max(35, frameWidth * 0.19) ||
+    (Math.abs(dx) > 18 && Math.abs(dx / duration) > 0.55);
+  const target = enough ? Math.max(0, Math.min(pageCount - 1, current + (dx < 0 ? 1 : -1))) : current;
+  settle(target === current ? 0 : -Math.sign(target - current) * frameWidth, target);
+}
+viewport.addEventListener("pointerup", endPointer);
+viewport.addEventListener("pointercancel", event => {
+  if (!pointer || pointer.id !== event.pointerId) return;
+  pointer = null; settle(0, current);
+});
+window.addEventListener("keydown", event => {
+  if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+  event.preventDefault();
+  animateTo(current + (event.key === "ArrowRight" ? 1 : -1));
+});
+viewport.addEventListener("wheel", event => {
+  if (Math.abs(event.deltaX) <= Math.abs(event.deltaY) || Math.abs(event.deltaX) < 12) return;
+  event.preventDefault();
+  if (performance.now() - wheelTime < 500) return;
+  wheelTime = performance.now();
+  animateTo(current + (event.deltaX > 0 ? 1 : -1));
+}, { passive: false });
+function onResize() {
+  cancelAnimationFrame(resizeTicket);
+  resizeTicket = requestAnimationFrame(() => {
+    if (pointer || activeAnimation) return;
+    const oldWidth = frameWidth, oldHeight = frameHeight;
+    sizing();
+    if (Math.abs(frameWidth - oldWidth) > 1 || Math.abs(frameHeight - oldHeight) > 1) {
+      ++renderGeneration;
+      for (const entry of cache.values()) entry.ready = false;
+      mount();
+    }
+  });
+}
+window.addEventListener("resize", onResize);
+window.visualViewport?.addEventListener("resize", onResize);
+window.visualViewport?.addEventListener("scroll", onResize);
+document.addEventListener("touchmove", event => { if (event.cancelable) event.preventDefault(); }, { passive: false });
+(async () => {
+  try {
+    sizing();
+    const loading = pdfjs.getDocument({ url: PDF_URL, cMapUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/cmaps/", cMapPacked: true });
+    documentPdf = await loading.promise;
+    pageCount = documentPdf.numPages;
+    const first = await documentPdf.getPage(1);
+    const size = first.getViewport({ scale: 1 });
+    pageRatio = size.width / size.height;
+    sizing();
+    await render(0);
+    mount();
+    viewport.classList.add("ready");
+  } catch (error) {
+    console.error("Could not load Beachcomber guide", error);
+    announcer.textContent = "The guide could not be loaded. Please reload the page.";
+  }
 })();
