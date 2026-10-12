@@ -181,7 +181,7 @@ function closeProfile(updateHistory = true) {
 }
 document.querySelectorAll(".profile-back").forEach(button => button.addEventListener("click", () => closeProfile()));
 window.addEventListener("popstate", () => {
-  const found = Object.entries(profiles).find(([, data]) => data.path === location.pathname.replace(/\\/$/, ""));
+  const found = Object.entries(profiles).find(([, data]) => data.path === location.pathname.replace(/\/$/, ""));
   if (found) {
     if (activeProfile !== found[0]) openProfile(found[0], false);
   } else {
@@ -295,7 +295,7 @@ document.addEventListener("touchmove", event => { if (event.cancelable) event.pr
     const size = first.getViewport({ scale: 1 });
     pageRatio = size.width / size.height;
     sizing();
-    const direct = Object.entries(profiles).find(([, data]) => data.path === location.pathname.replace(/\\/$/, ""));
+    const direct = Object.entries(profiles).find(([, data]) => data.path === location.pathname.replace(/\/$/, ""));
     if (direct) {
       current = direct[1].page;
       mount();
