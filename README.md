@@ -14,12 +14,12 @@ The HTML robots tag and the Vercel `X-Robots-Tag` header both request `noindex` 
 
 ## Scope
 
-- One photograph, one venue, two primary actions, and four supporting links including icon-only Instagram and Facebook links.
+- One photograph, one venue, four full-width action buttons (Book Tickets, Get Directions, Website and Call), and two centred icon-only social links (Instagram and Facebook).
 - Business information and operating hours are hardcoded. Tap the open or closed status to expand all seven days; the current Sydney weekday is highlighted.
 - Open or closed status is calculated in the `Australia/Sydney` timezone, including daylight saving time.
 - Daily opening: 9:00am to 5:00pm. Closed Christmas Day.
 - There is no API, account system, CMS, analytics, embedded map or digital guide.
-- Small devices can scroll naturally; the design targets 390 x 844 and 393 x 852 viewports.
+- Small devices can scroll naturally; the design targets 390 x 844 and 393 x 852 viewports. The social icons are centred horizontally and vertically within the available space below the action buttons.
 - External links to the park's official ticket page, website, Instagram, Facebook, Google Maps and telephone are direct.
 
 ## Photo and license
