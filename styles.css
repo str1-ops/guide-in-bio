@@ -38,20 +38,39 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   min-height: 100svh;
 }
 
+/* Only clip the off-layout box when the complete guide fits visually.
+   The fitting code removes this class for an opened weekly schedule. */
+.guide-shell.is-viewport-fitted {
+  height: var(--viewport-height, 100dvh);
+  min-height: 0;
+  overflow: hidden;
+}
+
 .guide-page {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 610px;
   min-height: 100vh;
-  min-height: 100svh;
+  min-height: 100dvh;
   margin: 0 auto;
   padding: clamp(18px, 4.55vw, 28px) clamp(15px, 3.8vw, 23px) max(21px, env(safe-area-inset-bottom, 0px));
   background: var(--paper);
+  opacity: 1;
+  transform: scale(var(--fit-scale, 1));
+  transform-origin: top center;
+  transition: opacity 150ms ease;
+  will-change: opacity;
 }
+
+/* Fade the complete printed page, including both photos and all text. */
+.guide-page.is-fading { opacity: 0; }
 
 .photo-wrap {
   position: relative;
   width: 100%;
   aspect-ratio: 553 / 317;
+  height: var(--photo-height, auto);
   background: #e9dcc7;
 }
 
@@ -143,46 +162,34 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
 .content-stage {
   position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   margin-top: clamp(22px, 5.6vw, 34px);
-  transition: height var(--duration) cubic-bezier(.22, .72, .25, 1);
 }
 
-.stage-panel {
-  width: 100%;
-  transition:
-    opacity var(--duration) ease,
-    transform var(--duration) cubic-bezier(.22, .72, .25, 1),
-    visibility 0s linear var(--duration);
-}
+.stage-panel { width: 100%; }
 
 html[data-view="guide"] .pearl-business,
 html[data-view="expanded"] .expanded-panel {
   position: relative;
-  opacity: 1;
+  flex: 1;
   visibility: visible;
-  transform: translateY(0);
   pointer-events: auto;
-  transition:
-    opacity var(--duration) ease,
-    transform var(--duration) cubic-bezier(.22, .72, .25, 1),
-    visibility 0s;
 }
 
 html[data-view="guide"] .expanded-panel,
 html[data-view="expanded"] .pearl-business {
   position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
+  inset: 0 auto auto 0;
   visibility: hidden;
-  transform: translateY(9px);
   pointer-events: none;
 }
 
 .expanded-panel {
   display: flex;
   flex-direction: column;
-  min-height: max(355px, calc(100svh - 430px));
+  min-height: 352px;
 }
 
 .back-to-guide {
@@ -341,7 +348,6 @@ html[data-view="expanded"] .pearl-business {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .content-stage,
-  .stage-panel,
+  .guide-page,
   .chevron { transition: none !important; }
 }
