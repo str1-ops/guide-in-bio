@@ -15,7 +15,8 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 .profile[hidden], #viewport[hidden] { display: none !important; }
 .profile { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; background: #000; overflow: hidden; }
 .profile-paper { position: relative; width: var(--page-width); height: var(--page-height); overflow: hidden; background: #fff2dc; color: #607e93; font-family: Georgia, "Times New Roman", serif; }
-.profile-back { position: absolute; left: 7%; top: 5%; width: 5.8%; aspect-ratio: 1; min-width: 29px; border: 0; border-radius: 50%; background: #82402d; color: #fff; font-family: Arial, sans-serif; font-size: clamp(19px, 3vh, 29px); line-height: 1; cursor: pointer; z-index: 2; }
+.profile-back { position: absolute; left: 7%; top: 5%; width: clamp(29px, calc(var(--page-width) * .058), 42px); aspect-ratio: 1; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: #82402d; color: #fff; cursor: pointer; z-index: 2; }
+.profile-back svg { display: block; width: 52%; height: 52%; flex: none; }
 .profile-content { position: absolute; inset: 19% 4% auto; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .beachie-wordmark { position: relative; width: 68%; height: calc(var(--page-height) * .108); color: #64839b; transform: rotate(-3deg); }
 .wordmark-the { position: absolute; top: 0; left: 35%; font-size: calc(var(--page-height) * .021); font-style: italic; }
@@ -24,10 +25,10 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 .wordmark-caption { position: absolute; bottom: 0; left: 16%; right: 0; font: 600 calc(var(--page-height) * .009) Arial, sans-serif; letter-spacing: .27em; }
 .profile-content h1 { font-size: calc(var(--page-height) * .028); font-weight: 400; margin: calc(var(--page-height) * .033) 0 calc(var(--page-height) * .067); line-height: 1.2; white-space: nowrap; }
 .profile-actions { display: flex; flex-direction: column; gap: calc(var(--page-height) * .017); width: 52%; }
-.profile-actions button { display: block; width: 100%; height: calc(var(--page-height) * .057); border: 0; border-radius: 0; padding: 0 5px; color: #fff; font: 400 calc(var(--page-height) * .027) Georgia, "Times New Roman", serif; cursor: pointer; }
+.profile-actions a { display: flex; align-items: center; justify-content: center; text-decoration: none; width: 100%; height: calc(var(--page-height) * .057); border: 0; border-radius: 0; padding: 0 5px; color: #fff; font: 400 calc(var(--page-height) * .027) Georgia, "Times New Roman", serif; cursor: pointer; }
 .action-food { background: #81402f; } .action-drinks { background: #303044; } .action-bookings { background: #000; } .action-room { background: #5e8095; }
 .profile-socials { display: flex; justify-content: center; gap: calc(var(--page-height) * .017); margin-top: calc(var(--page-height) * .049); }
-.social-icon { background: transparent; color: #000; border: 0; padding: 0; width: calc(var(--page-height) * .036); height: calc(var(--page-height) * .036); cursor: pointer; }
+.social-icon { display: inline-flex; align-items: center; justify-content: center; background: transparent; color: #000; border: 0; padding: 0; width: calc(var(--page-height) * .036); height: calc(var(--page-height) * .036); cursor: pointer; }
 .social-icon svg { display: block; width: 100%; height: 100%; }
-.profile-back:focus-visible, .profile button:focus-visible, .pdf-hotspot:focus-visible { outline: 2px solid #647f95; outline-offset: 2px; }
+.profile-back:focus-visible, .profile button:focus-visible, .profile a:focus-visible, .pdf-hotspot:focus-visible { outline: 2px solid #647f95; outline-offset: 2px; }
 .pdf-hotspot { position: absolute; z-index: 3; border: 0; background: transparent; opacity: 0; cursor: pointer; touch-action: manipulation; }
