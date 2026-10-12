@@ -100,28 +100,49 @@ window.addEventListener("popstate", () => {
   else closeProfile(false);
 });
 
-// Separate transparent button layer, fixed to the displayed image, not the
-// moving carousel. Page-relative percentages can be refined independently.
-const hotspots = [
-  { page: 3, name: "beachie", style: "left:71%;top:55%;width:28%;height:13%;" },
-  { page: 9, name: "reptile", style: "left:65%;top:0%;width:35%;height:18%;" }
-].map(config => {
+// Visible buttons live above the page images, not inside the moving image track.
+// Coordinates are percentages of the guide page and scale with its fitted frame.
+// Unbuilt profiles retain their visible pill, but are disabled until ready.
+const buttonSpecs = [
+  { page: 3, name: "beachie", label: "The Beachie", x: 75, y: 61.8 },
+  { page: 5, label: "Caves Coastal", x: 75, y: 62.1 },
+  { page: 9, name: "reptile", label: "Australian Reptile Park", x: 75, y: 37.6 },
+  { page: 9, label: "Broken Bay Pearl Farm", x: 75, y: 82.2 },
+  { page: 10, label: "Chocolate Factory Gosford", x: 75, y: 37.6 },
+  { page: 10, label: "Central Coast Aero Club", x: 75, y: 82.2 },
+  { page: 11, label: "Glenworth Valley Horse Riding", x: 75, y: 37.6 },
+  { page: 11, label: "Iris Lodge Alpacas", x: 75, y: 82.2 },
+  { page: 12, label: "Treetops Adventure Park", x: 75, y: 37.6 },
+  { page: 12, label: "8 at Trinity", x: 75, y: 82.2 }
+];
+const viewButtons = buttonSpecs.map(spec => {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "pdf-hotspot viewport-hotspot";
-  button.style.cssText = config.style;
-  button.setAttribute("aria-label", "View " + profiles[config.name].title + " profile");
+  button.className = "guide-view-pill";
+  button.style.left = spec.x + "%";
+  button.style.top = spec.y + "%";
+  button.textContent = "View ›";
+  button.setAttribute("aria-label", "View " + spec.label);
+  button.title = spec.name ? "View " + spec.label : spec.label + " profile coming soon";
+  if (!spec.name) {
+    button.disabled = true;
+    button.setAttribute("aria-label", spec.label + " profile coming soon");
+  } else {
+    button.addEventListener("click", event => {
+      event.stopPropagation();
+      openProfile(spec.name);
+    });
+  }
+  // The swipe listener is on #viewport; avoid pointer capture for a pill tap.
   button.addEventListener("pointerdown", event => event.stopPropagation());
   button.addEventListener("pointerup", event => event.stopPropagation());
-  button.addEventListener("click", event => {
-    event.stopPropagation();
-    openProfile(config.name);
-  });
   viewport.append(button);
-  return { ...config, button };
+  return { ...spec, button };
 });
 function updateHotspots() {
-  hotspots.forEach(({page, button}) => { button.hidden = activeProfile !== null || current !== page; });
+  viewButtons.forEach(({ page, button }) => {
+    button.hidden = activeProfile !== null || current !== page;
+  });
 }
 function endAnimation(next) {
   current = next;
@@ -148,7 +169,7 @@ function slide(next, offset = 0) {
 }
 viewport.addEventListener("pointerdown", event => {
   if (activeProfile || animating || pointer || (event.pointerType === "mouse" && event.button !== 0)) return;
-  if (event.target.closest(".viewport-hotspot")) return;
+  if (event.target.closest(".guide-view-pill")) return;
   pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, started: performance.now() };
   viewport.setPointerCapture(event.pointerId);
 });
