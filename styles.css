@@ -187,6 +187,9 @@ h1 {
 .status-dot.is-closed { background: #929187; }
 
 .visit {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   margin-top: clamp(22px, 4svh, 34px);
   padding-top: clamp(17px, 2.4svh, 22px);
   border-top: 1px solid var(--rule);
@@ -218,6 +221,10 @@ h1 {
   background: var(--ink);
 }
 .action-secondary { background: transparent; }
+.action-tertiary {
+  border-color: #a6a69f;
+  background: transparent;
+}
 
 .arrow {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -228,11 +235,12 @@ h1 {
 
 .extra-links {
   display: flex;
+  flex: 1;
   align-items: center;
-  justify-content: space-between;
-  gap: 7px;
-  min-height: 44px;
-  margin-top: clamp(10px, 1.7svh, 17px);
+  justify-content: center;
+  gap: 24px;
+  min-height: 78px;
+  padding: 14px 0;
 }
 
 .extra-links a {
@@ -245,13 +253,6 @@ h1 {
   -webkit-tap-highlight-color: transparent;
 }
 
-.extra-links .text-link {
-  font-size: 12.5px;
-  font-weight: 500;
-  letter-spacing: .012em;
-  text-decoration: none;
-}
-
 .social-link svg {
   display: block;
   width: 20px;
@@ -260,8 +261,8 @@ h1 {
 
 @media (hover: hover) and (pointer: fine) {
   .action-primary:hover { background: #464a41; }
-  .action-secondary:hover { background: #eae8e1; }
-  .extra-links .text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .action-secondary:hover,
+  .action-tertiary:hover { background: #eae8e1; }
   .social-link:hover { color: var(--ink); }
 }
 
