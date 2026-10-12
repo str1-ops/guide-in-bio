@@ -238,8 +238,27 @@ viewport.addEventListener("pointermove", event => {
 });
 function endPointer(event) {
   if (!pointer || pointer.id !== event.pointerId) return;
-  const { dx, startTime } = pointer;
+  const { dx, startTime, startX, startY } = pointer;
   pointer = null;
+  // The carousel captures pointer events for swipe handling. Resolve PDF
+  // link taps from page-relative coordinates as well, so mobile pointer
+  // capture cannot swallow the invisible button's synthetic click.
+  const rect = viewport.getBoundingClientRect();
+  const x = (startX - rect.left) / rect.width;
+  const y = (startY - rect.top) / rect.height;
+  const dy = event.clientY - startY;
+  const isTap = Math.abs(dx) < 16 && Math.abs(dy) < 16 &&
+    performance.now() - startTime < 650;
+  if (isTap && current === 9 && x >= 0.68 && y <= 0.17) {
+    position(0);
+    openProfile("reptile");
+    return;
+  }
+  if (isTap && current === 3 && x >= 0.71 && y >= 0.56 && y <= 0.67) {
+    position(0);
+    openProfile("beachie");
+    return;
+  }
   const duration = Math.max(performance.now() - startTime, 1);
   const enough = Math.abs(dx) > Math.max(35, frameWidth * 0.19) ||
     (Math.abs(dx) > 18 && Math.abs(dx / duration) > 0.55);
