@@ -44,7 +44,7 @@ const additionalBusinesses = [
   ["treetops", "Treetops Adventure", "treetops-logo.png",
     [["Book Adventure","https://treetopsadventure.com.au/location/nsw-central-coast/"],["Tree Ropes","https://treetopsadventure.com.au/location/nsw-central-coast/"],["Park Information","https://treetopsadventure.com.au/location/nsw-central-coast/"],["Directions","https://www.google.com/maps/search/?api=1&query=Treetops+Adventure+Ourimbah"]], []],
   ["trinity", "8 at Trinity", "trinity-logo.png",
-    [["Book a Table","https://8attrinitypoint.com.au/book/"],["Food Menu","https://8attrinitypoint.com.au/menus/lunch-dinner/"],["Drinks Menu","https://8attrinitypoint.com.au/menus/"],["Directions","https://www.google.com/maps/search/?api=1&query=81+Trinity+Point+Drive+Morisset+Park+NSW"]], []]
+    [["Book a Table","https://8attrinitypoint.com.au/book/"],["Food Menu","https://8attrinitypoint.com.au/menus/lunch-dinner/"],["Drinks Menu","https://8attrinitypoint.com.au/menus/"],["Directions","https://www.google.com/maps/search/?api=1&query=81+Trinity+Point+Drive+Morisset+Park+NSW"]], [["Instagram","https://www.instagram.com/8attrinity/"],["Facebook","https://www.facebook.com/8atTrinity/"]]]
 ];
 for (const [key, title, logo, actions, socials] of additionalBusinesses) {
   const section = document.createElement("section");
