@@ -44,7 +44,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   min-height: 100vh;
   min-height: 100svh;
   margin: 0 auto;
-  padding: clamp(18px, 4.55vw, 28px) 3.8% max(21px, env(safe-area-inset-bottom, 0px));
+  padding: clamp(18px, 4.55vw, 28px) clamp(15px, 3.8vw, 23px) max(21px, env(safe-area-inset-bottom, 0px));
   background: var(--paper);
 }
 
