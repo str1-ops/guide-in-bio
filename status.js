@@ -110,6 +110,8 @@ const PAGE_H_MM = 195;
 const PILL_W_MM = 20;
 const PILL_H_MM = 8.49;
 const X_CALIBRATION_MM = 4;
+// Nudge local business listing pills upward without affecting hotel pages.
+const BUSINESS_PILL_Y_OFFSET_MM = -1;
 const buttonSpecs = [
   { page: 3, name: "beachie", label: "The Beachie", xMm: 82.617, yMm: 121.334 },
   { page: 5, label: "Caves Coastal", xMm: 82.416, yMm: 119.639 },
@@ -130,7 +132,7 @@ function attachPageButtons(index, sheet) {
     button.type = "button";
     button.className = "guide-view-pill";
     button.style.left = (((centerX - PILL_W_MM / 2) / PAGE_W_MM) * 100) + "%";
-    button.style.top = (((spec.yMm - PILL_H_MM / 2) / PAGE_H_MM) * 100) + "%";
+    button.style.top = (((spec.yMm + (spec.page >= 9 && spec.page <= 12 ? BUSINESS_PILL_Y_OFFSET_MM : 0) - PILL_H_MM / 2) / PAGE_H_MM) * 100) + "%";
     button.style.width = (PILL_W_MM / PAGE_W_MM * 100) + "%";
     button.style.height = (PILL_H_MM / PAGE_H_MM * 100) + "%";
     button.textContent = "View ›";
