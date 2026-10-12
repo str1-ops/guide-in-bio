@@ -2,7 +2,7 @@
 
 A single-page proof of concept for a Strictons guide. The first view is designed to match the supplied printed Beachcomber guide screenshot: **Australian Reptile Park** followed by **Broken Bay Pearl Farm**, with the original editorial hierarchy, cream background, blue headings, brown contact details and matching photographs.
 
-Only Australian Reptile Park expands. The upper business section is never replaced. Tapping its **Learn More** button swaps the lower Pearl Farm section for opening hours, booking and contact actions, and social links. **Back to Guide** restores the two-business view.
+Only Australian Reptile Park has an interactive profile. Tapping **Learn More** fades out the printed guide and fades in a deliberately minimal full-screen view: a small centred park logo, business name, opening hours, four action buttons and Instagram/Facebook icons. No photograph, description, contact paragraph or driving time is duplicated in this view. **Back to Guide** restores the original two-business page. Both states use the same HTML document.
 
 ## URLs
 
@@ -25,18 +25,21 @@ Open `http://localhost:8000/` to review the guide. To test deep links by pasting
 
 ## Behaviour
 
-- The first crocodile photo, heading, short description, phone, website text, address and drive time remain visible in both states.
+- The first guide view preserves the crocodile and pearl farm photographs, business descriptions, contact details, addresses and drive times. The expanded view deliberately hides this guide content and shows only the logo, title and actions.
 - The second Pearl Farm **Learn More** button is intentionally disabled.
 - Switching views fades the **entire guide page** out and back in (150ms each). No content slides or fades independently. Users with `prefers-reduced-motion` see an immediate change.
 - **Back to Guide** restores the original section without a reload.
 - Opening status is hardcoded to 9:00am to 5:00pm, seven days a week, closed Christmas Day, with the current time evaluated using `Australia/Sydney` (including daylight saving). Its expandable list displays the full week and highlights today.
 - The existing Australian Reptile Park booking, Maps, website, call, Instagram and Facebook links are preserved.
-- Responsive viewport fitting measures **both states** (the two-business page and the collapsed-hours expanded profile) and sizes to the taller one, so switching views keeps the top business in the same position. On shorter screens the photography can be cropped vertically by up to 22%, then the entire page can scale uniformly if needed. For very short screens or large accessible type, the guide scrolls naturally rather than shrinking touch targets excessively. The column is no wider than 610px on desktop.
-- Expanding the full weekly hours intentionally enables scrolling so the seven rows remain legible. The initial guide and collapsed-hours profile otherwise aim to fit within the available viewport.
+- The initial printed guide remains responsive, with photograph cropping (up to 22%) and moderate proportional scaling on shorter screens. The compact profile independently uses a full-height flex layout with its small centred identity, readable buttons and socials filling the remaining vertical space. Extremely short screens and expanded weekly hours can scroll naturally.
+- Both states are centred in a column no wider than 610px on desktop.
 - Semantics include genuine buttons, labelled links, `aria-expanded`, `aria-hidden`, and `inert` on the inactive panel, with visible keyboard focus indicators.
 - Noindex metadata and response headers remain in place.
 
-## Photography
+## Photography and logo
+
+The expanded business profile uses the Australian Reptile Park's crocodile, snake and palm logo as a small centred mark. The prototype loads it from a [Sanity-hosted image](https://cdn.sanity.io/images/vzz04c32/production/fa34c6fb0d1add39dda6e29c40c9413647c39302-1181x1053.jpg). This is the organisation's brand identity and should be used with the brand owner's permission for any public/commercial release. Replace the hotlinked image with an authorised local or CDN version once approved.
+
 
 The screenshot provided by the user is the design reference. To reproduce its subjects without generating substitutes, the prototype currently loads corresponding photographs from public third-party image URLs:
 
