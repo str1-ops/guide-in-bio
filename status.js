@@ -1,6 +1,6 @@
 const files = [
   "Cover.png",
-  ...Array.from({ length: 14 }, (_, i) => `Page-${i + 1}.png`),
+  ...Array.from({ length: 14 }, (_, i) => i === 13 ? "page-14.png" : `Page-${i + 1}.png`),
   "Back Cover.png"
 ];
 const urls = files.map(file => "/assets/" + encodeURIComponent(file));
