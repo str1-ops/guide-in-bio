@@ -1,31 +1,49 @@
-# Strictons business profile prototype
+# Strictons Interactive Guide Prototype
 
-A single mobile-first business profile for **Australian Reptile Park**, created to test the experience after a guest scans a QR code in a physical Strictons hotel guide.
+A single-page proof of concept for a Strictons guide. The first view is designed to match the supplied printed Beachcomber guide screenshot: **Australian Reptile Park** followed by **Broken Bay Pearl Farm**, with the original editorial hierarchy, cream background, blue headings, brown contact details and matching photographs.
 
-## Run locally
+Only Australian Reptile Park expands. The upper business section is never replaced. Tapping its **Learn More** button swaps the lower Pearl Farm section for opening hours, booking and contact actions, and social links. **Back to Guide** restores the two-business view.
 
-No installation, framework, database or build step is required. Open `index.html` in a browser, or use a local static server such as `python3 -m http.server 8000`.
+## URLs
 
-## Deploy
+For a Vercel deployment connected to this repository:
 
-Connect the `guide-in-bio` repository to Vercel with the **Other** framework preset. Leave the build command empty and serve the repository root. The page is the site root (`/`), since this is a dedicated prototype repository rather than the Strictons website.
+- `/` or `/beachcomber`: the two-business guide view.
+- `/beachcomber/australian-reptile-park`: the **same page** with the Australian Reptile Park section already expanded. Intended as the future printed-guide QR destination.
 
-The HTML robots tag and the Vercel `X-Robots-Tag` header both request `noindex` while this remains a prototype.
+These routes work on direct requests because `vercel.json` rewrites the `/beachcomber` paths to `/index.html`. Relative navigation uses `history.pushState` and supports the browser Back and Forward buttons without page reloads. CSS and JavaScript are referenced from absolute root paths.
 
-## Scope
+## Running locally
 
-- One photograph, one venue, four full-width action buttons (Book Tickets, Get Directions, Website and Call), and two centred icon-only social links (Instagram and Facebook).
-- Business information and operating hours are hardcoded. Tap the open or closed status to expand all seven days; the current Sydney weekday is highlighted.
-- Open or closed status is calculated in the `Australia/Sydney` timezone, including daylight saving time.
-- Daily opening: 9:00am to 5:00pm. Closed Christmas Day.
-- There is no API, account system, CMS, analytics, embedded map or digital guide.
-- Small devices can scroll naturally; the design targets 390 x 844 and 393 x 852 viewports. The social icons are centred horizontally and vertically within the available space below the action buttons.
-- External links to the park's official ticket page, website, Instagram, Facebook, Google Maps and telephone are direct.
+No packages, framework, build command or database required.
 
-## Hero image
+```sh
+python3 -m http.server 8000
+```
 
-The prototype uses the Google-hosted thumbnail URL provided for the hero image:
+Open `http://localhost:8000/` to review the guide. To test deep links by pasting the expanded URL into a new tab, use a Vercel deployment or another static hosting server configured with the rewrites. Python's basic static server does not implement these rewrites.
 
-https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfMo6lhRBYHfJcayi_4ZVGM5RNMpnz98tRyBPAI_n_gg&s=10
+## Behaviour
 
-This image is externally hosted, and its resolution, continued availability, copyright holder and reuse permissions have not been verified. For production, obtain the original high-resolution image with permission to use it, then host an optimized copy on the project's own image CDN. The previous Wikimedia image and its specific licence and photographer metadata have been removed from the page.
+- The first crocodile photo, heading, short description, phone, website text, address and drive time remain visible in both states.
+- The second Pearl Farm **Learn More** button is intentionally disabled.
+- The lower content crossfades and shifts about 9px over 300ms, while the section height adjusts. Users with `prefers-reduced-motion` see an immediate state change.
+- **Back to Guide** restores the original section without a reload.
+- Opening status is hardcoded to 9:00am to 5:00pm, seven days a week, closed Christmas Day, with the current time evaluated using `Australia/Sydney` (including daylight saving). Its expandable list displays the full week and highlights today.
+- The existing Australian Reptile Park booking, Maps, website, call, Instagram and Facebook links are preserved.
+- The design is responsive, scrolls normally on smaller screens and centres within a narrow 610px guide column on desktop.
+- Semantics include genuine buttons, labelled links, `aria-expanded`, `aria-hidden`, and `inert` on the inactive panel, with visible keyboard focus indicators.
+- Noindex metadata and response headers remain in place.
+
+## Photography
+
+The screenshot provided by the user is the design reference. To reproduce its subjects without generating substitutes, the prototype currently loads corresponding photographs from public third-party image URLs:
+
+- Crocodile demonstration photograph: [Ticket image hosted by Framer](https://framerusercontent.com/images/9nR2gl4NIkdSr2SAGFRIQyHlM.jpg?height=999&width=1600).
+- Pearl Farm group on the jetty: [NSW tourism image hosted by ATDW](https://assets.atdw-online.com.au/images/153a3f267e69ecc61ea1c626a8fbfa34.jpeg?fm=jpg&h=1200&q=eyJ0eXBlIjoibGlzdGluZyIsImxpc3RpbmdJZCI6IjVjMTg0MzZhYmNmNjIyZjU1MjUwYjA0MCIsImRpc3RyaWJ1dG9ySWQiOiI1NmIxZWI5MzQ0ZmVjYTNkZjJlMzIwYzgiLCJhcGlrZXlJZCI6IjU2YjFlZTU5MGNmMjEzYWQyMGRjNTgxOSJ9%3Fw%3D1600&rect=0%2C0%2C1600%2C1200&rot=360&w=1600).
+
+These are visually matching photographs, but permission to reuse them and stable hotlinking are **not verified**. The prototype intentionally has no visual photo credits, as requested. Before public/commercial distribution, replace these URLs with authorised, high-resolution, optimized and reliably hosted originals. Do not infer usage rights from a public image URL.
+
+## Deliberate exclusions
+
+No other guide pages, menu, map embed, analytics, new business profiles, dashboard, CMS, authentication, database, booking form or Places API integration.
