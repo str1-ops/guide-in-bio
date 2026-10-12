@@ -27,11 +27,12 @@ Open `http://localhost:8000/` to review the guide. To test deep links by pasting
 
 - The first crocodile photo, heading, short description, phone, website text, address and drive time remain visible in both states.
 - The second Pearl Farm **Learn More** button is intentionally disabled.
-- The lower content crossfades and shifts about 9px over 300ms, while the section height adjusts. Users with `prefers-reduced-motion` see an immediate state change.
+- Switching views fades the **entire guide page** out and back in (150ms each). No content slides or fades independently. Users with `prefers-reduced-motion` see an immediate change.
 - **Back to Guide** restores the original section without a reload.
 - Opening status is hardcoded to 9:00am to 5:00pm, seven days a week, closed Christmas Day, with the current time evaluated using `Australia/Sydney` (including daylight saving). Its expandable list displays the full week and highlights today.
 - The existing Australian Reptile Park booking, Maps, website, call, Instagram and Facebook links are preserved.
-- The design is responsive, scrolls normally on smaller screens and centres within a narrow 610px guide column on desktop.
+- Responsive viewport fitting measures **both states** (the two-business page and the collapsed-hours expanded profile) and sizes to the taller one, so switching views keeps the top business in the same position. On shorter screens the photography can be cropped vertically by up to 22%, then the entire page can scale uniformly if needed. For very short screens or large accessible type, the guide scrolls naturally rather than shrinking touch targets excessively. The column is no wider than 610px on desktop.
+- Expanding the full weekly hours intentionally enables scrolling so the seven rows remain legible. The initial guide and collapsed-hours profile otherwise aim to fit within the available viewport.
 - Semantics include genuine buttons, labelled links, `aria-expanded`, `aria-hidden`, and `inert` on the inactive panel, with visible keyboard focus indicators.
 - Noindex metadata and response headers remain in place.
 
