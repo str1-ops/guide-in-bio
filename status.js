@@ -4,6 +4,11 @@
 
   const statusText = document.getElementById("status-text");
   const statusDot = document.querySelector(".status-dot");
+  const weekdayClock = new Intl.DateTimeFormat("en-AU", {
+    timeZone: "Australia/Sydney",
+    weekday: "long",
+  });
+  const dayRows = document.querySelectorAll("[data-day]");
 
   if (!statusText || !statusDot) return;
 
@@ -43,6 +48,11 @@
 
     statusText.textContent = label;
     statusDot.classList.toggle("is-closed", !open);
+
+    const today = weekdayClock.format(new Date());
+    dayRows.forEach((row) => {
+      row.classList.toggle("is-today", row.dataset.day === today);
+    });
   }
 
   updateOpeningStatus();
