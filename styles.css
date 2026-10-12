@@ -42,3 +42,6 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 /* Keep the page-ten link above the swipe track, but invisible. */
 .viewport-hotspot { z-index: 10; }
 .viewport-hotspot[hidden] { display: none !important; }
+
+/* Image-based pages preserve the exported artwork at its original proportions. */
+.sheet .guide-image { display: block; width: 100%; height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; }
