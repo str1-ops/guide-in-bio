@@ -1,6 +1,6 @@
-import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
+import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/build/pdf.min.mjs";
 
-pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/build/pdf.worker.min.mjs";
 
 const PDF_URL = "/Beachcomber-Digital-Guide-2.pdf";
 const root = document.getElementById("publication");
@@ -200,7 +200,7 @@ document.addEventListener("touchmove", event => { if (event.cancelable) event.pr
 (async () => {
   try {
     sizing();
-    const loading = pdfjs.getDocument({ url: PDF_URL, cMapUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/cmaps/", cMapPacked: true });
+    const loading = pdfjs.getDocument({ url: PDF_URL, cMapUrl: "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/cmaps/", cMapPacked: true });
     documentPdf = await loading.promise;
     pageCount = documentPdf.numPages;
     const first = await documentPdf.getPage(1);
