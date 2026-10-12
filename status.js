@@ -9,6 +9,8 @@ const viewport = document.getElementById("viewport");
 const track = document.getElementById("track");
 const announcer = document.getElementById("announcer");
 const controls = document.getElementById("page-controls");
+const profileControls = document.getElementById("profile-controls");
+const profileControlsBack = document.getElementById("profile-controls-back");
 const prevButton = document.getElementById("page-prev");
 const nextButton = document.getElementById("page-next");
 const jumpForm = document.getElementById("page-jump");
@@ -30,10 +32,10 @@ function fit() {
   const view = window.visualViewport;
   const width = view?.width || innerWidth;
   const height = view?.height || innerHeight;
-  const availableHeight = Math.max(1, height - (controlsOpen && !activeProfile ? CONTROL_HEIGHT : 0));
+  const availableHeight = Math.max(1, height - (controlsOpen ? CONTROL_HEIGHT : 0));
   frameWidth = Math.min(width, availableHeight * ratio);
   frameHeight = frameWidth / ratio;
-  root.classList.toggle("controls-open", controlsOpen && !activeProfile);
+  root.classList.toggle("controls-open", controlsOpen);
   root.style.width = width + "px";
   root.style.height = height + "px";
   root.style.left = (view?.offsetLeft || 0) + "px";
@@ -85,13 +87,18 @@ function mount() {
     else setTimeout(preload, 200);
   }
 }
+function syncControls() {
+  controls.hidden = !controlsOpen || Boolean(activeProfile);
+  profileControls.hidden = !controlsOpen || !activeProfile;
+}
 function setControls(open) {
-  if (activeProfile || controlsOpen === open) return;
+  if (controlsOpen === open) return;
   controlsOpen = open;
-  controls.hidden = !open;
+  syncControls();
   fit();
   mount();
 }
+profileControlsBack.addEventListener("click", () => closeProfile());
 prevButton.addEventListener("click", () => goToPage(current - 1));
 nextButton.addEventListener("click", () => goToPage(current + 1));
 // Keep a brief delay for single digits so typing "12" doesn't jump to page 1.
@@ -140,9 +147,8 @@ function goToPage(index) {
 function openProfile(name, updateHistory = true) {
   const data = profiles[name];
   if (!data) return;
-  controls.hidden = true;
-  controlsOpen = false;
   activeProfile = name;
+  syncControls();
   fit();
   Object.values(profiles).forEach(entry => { entry.element.hidden = entry !== data; });
   viewport.hidden = true;
@@ -155,6 +161,7 @@ function closeProfile(updateHistory = true) {
   if (!activeProfile) return;
   current = profiles[activeProfile].page;
   activeProfile = null;
+  syncControls();
   Object.values(profiles).forEach(entry => { entry.element.hidden = true; });
   viewport.hidden = false;
   fit();
@@ -163,6 +170,23 @@ function closeProfile(updateHistory = true) {
   mount();
 }
 document.querySelectorAll(".profile-back").forEach(button => button.addEventListener("click", () => closeProfile()));
+// Vertical gesture on a business profile uses the same controls as the guide.
+for (const profile of Object.values(profiles)) {
+  let gesture = null;
+  profile.element.addEventListener("pointerdown", event => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (event.target.closest("button, a, input, nav")) return;
+    gesture = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  });
+  profile.element.addEventListener("pointerup", event => {
+    if (!gesture || gesture.id !== event.pointerId) return;
+    const dx = event.clientX - gesture.x;
+    const dy = event.clientY - gesture.y;
+    gesture = null;
+    if (Math.abs(dy) > 45 && Math.abs(dy) > Math.abs(dx) * 1.2) setControls(dy < 0);
+  });
+  profile.element.addEventListener("pointercancel", () => { gesture = null; });
+}
 window.addEventListener("popstate", () => {
   const match = Object.entries(profiles).find(([, data]) => data.path === location.pathname.replace(/\/$/, ""));
   if (match) openProfile(match[0], false);
