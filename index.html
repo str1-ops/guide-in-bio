@@ -16,6 +16,17 @@
     <div id="viewport" aria-roledescription="publication">
       <div id="track" aria-live="off"></div>
     </div>
+    <nav id="page-controls" class="page-controls" aria-label="Guide page navigation" hidden>
+      <button id="page-prev" class="page-nav-arrow" type="button" aria-label="Previous page">‹</button>
+      <form id="page-jump" class="page-jump">
+        <label for="page-number">Page</label>
+        <input id="page-number" type="number" inputmode="numeric" min="1" max="16" value="1" aria-label="Page number, 1 to 16">
+        <span class="page-total">/ 16</span>
+        <button type="submit" class="page-go">Go</button>
+      </form>
+      <button id="page-next" class="page-nav-arrow" type="button" aria-label="Next page">›</button>
+      <button id="page-close" class="page-close" type="button" aria-label="Hide page controls">⌄</button>
+    </nav>
     <section id="beachie-profile" class="profile" hidden aria-label="The Beachie Bar and Bistro profile">
       <div class="profile-paper">
         <button type="button" id="profile-back" class="profile-back" aria-label="Back to page four of guide"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 18 9 12l6-6"/></svg></button>
