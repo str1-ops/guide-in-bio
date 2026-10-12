@@ -11,7 +11,6 @@ const announcer = document.getElementById("announcer");
 const controls = document.getElementById("page-controls");
 const prevButton = document.getElementById("page-prev");
 const nextButton = document.getElementById("page-next");
-const closeButton = document.getElementById("page-close");
 const jumpForm = document.getElementById("page-jump");
 const pageInput = document.getElementById("page-number");
 let controlsOpen = false;
@@ -93,22 +92,43 @@ function setControls(open) {
   fit();
   mount();
 }
-closeButton.addEventListener("click", () => setControls(false));
 prevButton.addEventListener("click", () => goToPage(current - 1));
 nextButton.addEventListener("click", () => goToPage(current + 1));
+// Keep a brief delay for single digits so typing "12" doesn't jump to page 1.
+let pageEntryTimer = null;
+function commitPageEntry() {
+  clearTimeout(pageEntryTimer);
+  pageEntryTimer = null;
+  const raw = pageInput.value.trim();
+  const value = Number(raw);
+  if (/^\\d{1,2}$/.test(raw) && Number.isInteger(value) && value >= 1 && value <= urls.length) {
+    goToPage(value - 1);
+    pageInput.blur();
+  } else {
+    pageInput.value = String(current + 1);
+  }
+}
+pageInput.addEventListener("focus", () => {
+  clearTimeout(pageEntryTimer);
+  requestAnimationFrame(() => pageInput.select());
+});
+pageInput.addEventListener("click", () => pageInput.select());
+pageInput.addEventListener("input", () => {
+  clearTimeout(pageEntryTimer);
+  const value = pageInput.value.replace(/\\D/g, "").slice(0, 2);
+  pageInput.value = value;
+  if (!value) return;
+  // Two digits are a completed page number; single digits may lead to 10-16.
+  if (value.length === 2) commitPageEntry();
+  else pageEntryTimer = setTimeout(commitPageEntry, 650);
+});
+pageInput.addEventListener("blur", () => {
+  if (pageEntryTimer !== null) commitPageEntry();
+});
 jumpForm.addEventListener("submit", event => {
   event.preventDefault();
-  const target = Number(pageInput.value);
-  if (!Number.isInteger(target) || target < 1 || target > urls.length) {
-    pageInput.setCustomValidity("Enter a page between 1 and " + urls.length);
-    pageInput.reportValidity();
-    return;
-  }
-  pageInput.setCustomValidity("");
-  pageInput.blur();
-  goToPage(target - 1);
+  commitPageEntry();
 });
-pageInput.addEventListener("input", () => pageInput.setCustomValidity(""));
 function goToPage(index) {
   if (activeProfile || !Number.isInteger(index) || index < 0 || index >= urls.length) return;
   // Jump directly, without animating through intervening pages.
