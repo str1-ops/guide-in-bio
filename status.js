@@ -254,7 +254,13 @@ for (const profile of Object.values(profiles)) {
     const dx = event.clientX - gesture.x;
     const dy = event.clientY - gesture.y;
     gesture = null;
-    if (Math.abs(dy) > 45 && Math.abs(dy) > Math.abs(dx) * 1.2) setControls(dy < 0);
+    if (Math.abs(dy) > 45 && Math.abs(dy) > Math.abs(dx) * 1.2) {
+      setControls(dy < 0);
+    } else if (dx > 45 && dx > Math.abs(dy) * 1.2) {
+      // Profiles are outside the guide sequence: right swipe returns,
+      // while left swipe intentionally does nothing.
+      closeProfile();
+    }
   });
   profile.element.addEventListener("pointercancel", () => { gesture = null; });
 }
