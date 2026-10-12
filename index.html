@@ -5,101 +5,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
     <meta name="googlebot" content="noindex, nofollow, noarchive" />
-    <meta name="theme-color" content="#f6f4ef" />
-    <meta name="description" content="Plan a visit to Australian Reptile Park, Pacific Highway, Somersby NSW 2250." />
-    <title>Australian Reptile Park | Strictons</title>
-    <link rel="stylesheet" href="./styles.css" />
-    <script src="./status.js" defer></script>
+    <meta name="theme-color" content="#fdf4e1" />
+    <meta name="description" content="Explore Australian Reptile Park and Broken Bay Pearl Farm in the Beachcomber hotel guide." />
+    <title>Local Finds | Beachcomber Guide</title>
+    <link rel="preconnect" href="https://framerusercontent.com" crossorigin />
+    <link rel="preconnect" href="https://assets.atdw-online.com.au" crossorigin />
+    <script>
+      (function () {
+        var directProfile = /^\/beachcomber\/australian-reptile-park\/?$/.test(location.pathname);
+        document.documentElement.dataset.view = directProfile ? "expanded" : "guide";
+      })();
+    </script>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/status.js" defer></script>
   </head>
   <body>
-    <main class="page">
-      <article class="profile" aria-labelledby="business-name">
-        <figure class="hero">
-          <img
-            class="hero-image"
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfMo6lhRBYHfJcayi_4ZVGM5RNMpnz98tRyBPAI_n_gg&amp;s=10"
-            alt="Australian Reptile Park"
-            fetchpriority="high"
-            loading="eager"
-            decoding="async"
-          />
-        </figure>
+    <main class="guide-shell">
+      <div class="guide-page">
+        <section class="business reptile-business" aria-labelledby="reptile-title">
+          <div class="photo-wrap">
+            <img
+              class="business-photo reptile-photo"
+              src="https://framerusercontent.com/images/9nR2gl4NIkdSr2SAGFRIQyHlM.jpg?height=999&amp;width=1600"
+              alt="A crocodile rises from the water during a demonstration as families watch at Australian Reptile Park"
+              width="1600"
+              height="999"
+              fetchpriority="high"
+              loading="eager"
+              decoding="async"
+            />
+            <button
+              class="learn-more"
+              id="reptile-learn-more"
+              type="button"
+              aria-controls="reptile-expanded"
+              aria-expanded="false"
+            >
+              <span>Learn More</span>
+              <span class="link-arrow" aria-hidden="true">↗</span>
+            </button>
+          </div>
+          <div class="business-copy">
+            <h1 id="reptile-title">Australian Reptile Park</h1>
+            <p class="description">
+              Get up close with Australia's most iconic wildlife at the Australian Reptile Park.
+              Meet koalas, kangaroos, crocodiles and more, with exciting daily shows and animal encounters.
+            </p>
+            <div class="business-meta">
+              <div class="contact-details">
+                <p>(02) 4340 1022 <span aria-hidden="true">•</span> reptilepark.com.au</p>
+                <p>Pacific Highway, Somersby NSW 2250</p>
+              </div>
+              <p class="travel-time">36 Min Drive</p>
+            </div>
+          </div>
+        </section>
 
-        <div class="content">
-          <header class="intro">
-            <h1 id="business-name">Australian Reptile Park</h1>
-            <p class="location">Pacific Highway, Somersby NSW 2250</p>
+        <div class="content-stage" id="content-stage">
+          <section class="stage-panel pearl-business" id="pearl-business" aria-labelledby="pearl-title">
+            <div class="photo-wrap">
+              <img
+                class="business-photo pearl-photo"
+                src="https://assets.atdw-online.com.au/images/153a3f267e69ecc61ea1c626a8fbfa34.jpeg?fm=jpg&amp;h=1200&amp;q=eyJ0eXBlIjoibGlzdGluZyIsImxpc3RpbmdJZCI6IjVjMTg0MzZhYmNmNjIyZjU1MjUwYjA0MCIsImRpc3RyaWJ1dG9ySWQiOiI1NmIxZWI5MzQ0ZmVjYTNkZjJlMzIwYzgiLCJhcGlrZXlZCI6IjU2YjFlZTU5MGNmMjEzYWQyMGRjNTgxOSJ9%3Fw%3D1600&amp;rect=0%2C0%2C1600%2C1200&amp;rot=360&amp;w=1600"
+                alt="Guests are welcomed by their guide at the waterfront jetty at Broken Bay Pearl Farm"
+                width="1600"
+                height="1200"
+                loading="eager"
+                decoding="async"
+              />
+              <button class="learn-more" type="button" disabled title="Broken Bay Pearl Farm profile is not part of this prototype">
+                <span>Learn More</span>
+                <span class="link-arrow" aria-hidden="true">↗</span>
+              </button>
+            </div>
+            <div class="business-copy">
+              <h2 id="pearl-title">Broken Bay Pearl Farm</h2>
+              <p class="description">
+                Discover the secrets of pearl farming along the stunning Hawkesbury river.
+                Join scenic boat tours, shop handcrafted jewellery and gain hands-on experience with oyster farming.
+              </p>
+              <div class="business-meta">
+                <div class="contact-details">
+                  <p>0488 361 042 <span aria-hidden="true">•</span> brokenbaypearlfarm.com.au</p>
+                  <p>12 Kowan Road, Mooney Mooney NSW 2083</p>
+                </div>
+                <p class="travel-time">47 Min Drive</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="stage-panel expanded-panel" id="reptile-expanded" aria-label="Australian Reptile Park visit information">
+            <button class="back-to-guide" id="back-to-guide" type="button">
+              <span aria-hidden="true">←</span> Back to Guide
+            </button>
+
             <details class="hours-details" id="opening-hours">
-              <summary class="opening-status" title="Show opening hours for the week">
+              <summary class="opening-status">
                 <span class="status-dot" aria-hidden="true"></span>
-                <span class="status-text" id="status-text" role="status" aria-live="polite">Daily 9:00am to 5:00pm</span>
-                <svg class="hours-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span id="status-text" role="status" aria-live="polite">Daily 9:00am to 5:00pm</span>
+                <svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                  <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </summary>
               <div class="hours-panel">
                 <p class="hours-label">Opening hours</p>
                 <ul class="hours-list">
-                  <li class="hours-row" data-day="Monday"><span>Monday</span><span>9:00am to 5:00pm</span></li>
-                  <li class="hours-row" data-day="Tuesday"><span>Tuesday</span><span>9:00am to 5:00pm</span></li>
-                  <li class="hours-row" data-day="Wednesday"><span>Wednesday</span><span>9:00am to 5:00pm</span></li>
-                  <li class="hours-row" data-day="Thursday"><span>Thursday</span><span>9:00am to 5:00pm</span></li>
-                  <li class="hours-row" data-day="Friday"><span>Friday</span><span>9:00am to 5:00pm</span></li>
-                  <li class="hours-row" data-day="Saturday"><span>Saturday</span><span>9:00am to 5:00pm</span></li>
-                  <li class="hours-row" data-day="Sunday"><span>Sunday</span><span>9:00am to 5:00pm</span></li>
+                  <li data-day="Monday"><span>Monday</span><span>9:00am to 5:00pm</span></li>
+                  <li data-day="Tuesday"><span>Tuesday</span><span>9:00am to 5:00pm</span></li>
+                  <li data-day="Wednesday"><span>Wednesday</span><span>9:00am to 5:00pm</span></li>
+                  <li data-day="Thursday"><span>Thursday</span><span>9:00am to 5:00pm</span></li>
+                  <li data-day="Friday"><span>Friday</span><span>9:00am to 5:00pm</span></li>
+                  <li data-day="Saturday"><span>Saturday</span><span>9:00am to 5:00pm</span></li>
+                  <li data-day="Sunday"><span>Sunday</span><span>9:00am to 5:00pm</span></li>
                 </ul>
                 <p class="hours-note">Closed Christmas Day.</p>
               </div>
             </details>
-          </header>
 
-          <section class="visit" aria-label="Plan your visit">
-            <div class="primary-actions">
-              <a
-                class="action action-primary"
-                href="https://www.reptilepark.com.au/book-your-visit/day-passes"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>Book Tickets</span><span class="arrow" aria-hidden="true">↗</span>
+            <nav class="actions" aria-label="Plan your visit to Australian Reptile Park">
+              <a class="action action-primary" href="https://www.reptilepark.com.au/book-your-visit/day-passes" target="_blank" rel="noopener noreferrer">
+                <span>Book Tickets</span><span aria-hidden="true">↗</span>
               </a>
-              <a
-                class="action action-secondary"
-                href="https://www.google.com/maps/search/?api=1&amp;query=Australian%20Reptile%20Park%2C%20Pacific%20Highway%2C%20Somersby%20NSW%202250"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>Get Directions</span><span class="arrow" aria-hidden="true">↗</span>
+              <a class="action action-secondary" href="https://www.google.com/maps/search/?api=1&amp;query=Australian%20Reptile%20Park%2C%20Pacific%20Highway%2C%20Somersby%20NSW%202250" target="_blank" rel="noopener noreferrer">
+                <span>Get Directions</span><span aria-hidden="true">↗</span>
               </a>
-              <a
-                class="action action-tertiary"
-                href="https://www.reptilepark.com.au/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>Website</span><span class="arrow" aria-hidden="true">↗</span>
+              <a class="action action-secondary" href="https://www.reptilepark.com.au/" target="_blank" rel="noopener noreferrer">
+                <span>Website</span><span aria-hidden="true">↗</span>
               </a>
-              <a class="action action-tertiary" href="tel:+61243401022">
-                <span>Call</span><span class="arrow" aria-hidden="true">↗</span>
+              <a class="action action-secondary" href="tel:+61243401022">
+                <span>Call</span><span aria-hidden="true">↗</span>
               </a>
-            </div>
+            </nav>
 
-            <nav class="extra-links" aria-label="Social media">
-              <a class="social-link" href="https://www.instagram.com/australianreptilepark/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <nav class="social-links" aria-label="Australian Reptile Park social media">
+              <a href="https://www.instagram.com/australianreptilepark/" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-                  <rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.1" stroke="currentColor" stroke-width="1.7"/>
-                  <circle cx="12" cy="12" r="4.15" stroke="currentColor" stroke-width="1.7"/>
-                  <circle cx="17.65" cy="6.45" r="1.2" fill="currentColor"/>
+                  <rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.1" stroke="currentColor" stroke-width="1.7" />
+                  <circle cx="12" cy="12" r="4.15" stroke="currentColor" stroke-width="1.7" />
+                  <circle cx="17.65" cy="6.45" r="1.2" fill="currentColor" />
                 </svg>
               </a>
-              <a class="social-link" href="https://www.facebook.com/AustralianReptilePark/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              <a href="https://www.facebook.com/AustralianReptilePark/" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-                  <path d="M14.1 22v-8.2h2.8l.4-3.25h-3.2V8.47c0-.94.27-1.58 1.62-1.58h1.72V3.98a23.1 23.1 0 0 0-2.52-.13c-2.5 0-4.21 1.52-4.21 4.3v2.4H7.9v3.25h2.81V22h3.39Z"/>
+                  <path d="M14.1 22v-8.2h2.8l.4-3.25h-3.2V8.47c0-.94.27-1.58 1.62-1.58h1.72V3.98a23.1 23.1 0 0 0-2.52-.13c-2.5 0-4.21 1.52-4.21 4.3v2.4H7.9v3.25h2.81V22h3.39Z" />
                 </svg>
               </a>
             </nav>
           </section>
-
         </div>
-      </article>
+      </div>
     </main>
   </body>
 </html>
