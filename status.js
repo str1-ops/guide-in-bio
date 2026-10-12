@@ -14,7 +14,9 @@ const profiles = {
   reptile: { element: document.getElementById("reptile-profile"), path: "/beachcomber/australian-reptile-park", page: 9, title: "Australian Reptile Park" }
 };
 const sheets = new Map();
-let current = 0, activeProfile = null, ratio = 101.5 / 195;
+// Preserve the established digital guide page aspect ratio across every image.
+const ratio = 101.5 / 195;
+let current = 0, activeProfile = null;
 let frameWidth = 0, frameHeight = 0, pointer = null, animating = false, resizeFrame = 0, wheelAt = 0;
 
 function fit() {
@@ -193,15 +195,6 @@ visualViewport?.addEventListener("resize", resize);
 visualViewport?.addEventListener("scroll", resize);
 document.addEventListener("touchmove", event => { if (event.cancelable) event.preventDefault(); }, { passive: false });
 fit();
-const cover = new Image();
-cover.src = urls[0];
-cover.onload = () => {
-  if (cover.naturalWidth && cover.naturalHeight) {
-    ratio = cover.naturalWidth / cover.naturalHeight;
-    fit();
-    mount();
-  }
-};
 mount();
 const initial = Object.entries(profiles).find(([, data]) => data.path === location.pathname.replace(/\/$/, ""));
 if (initial) { current = initial[1].page; mount(); openProfile(initial[0], false); }
