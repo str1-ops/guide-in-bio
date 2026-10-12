@@ -47,6 +47,7 @@ function makeSheet(index) {
   img.loading = index <= 1 ? "eager" : "lazy";
   if (index === 0) img.fetchPriority = "high";
   element.append(img);
+  attachPageButtons(index, element);
   sheets.set(index, element);
   return element;
 }
@@ -100,50 +101,52 @@ window.addEventListener("popstate", () => {
   else closeProfile(false);
 });
 
-// Visible buttons live above the page images, not inside the moving image track.
-// Coordinates are percentages of the guide page and scale with its fitted frame.
-// Unbuilt profiles retain their visible pill, but are disabled until ready.
+// InDesign measurements: 101.5 x 195 mm per page; right-facing spread
+// coordinates begin at X=101.5 mm. Values refer to the pill group's centre.
+// A shared 4 mm visual X calibration matches the exported page artwork in the
+// supplied InDesign screenshots; change only X_CALIBRATION_MM if exports move.
+const PAGE_W_MM = 101.5;
+const PAGE_H_MM = 195;
+const PILL_W_MM = 20;
+const PILL_H_MM = 8.49;
+const X_CALIBRATION_MM = 4;
 const buttonSpecs = [
-  { page: 3, name: "beachie", label: "The Beachie", x: 75, y: 61.8 },
-  { page: 5, label: "Caves Coastal", x: 75, y: 62.1 },
-  { page: 9, name: "reptile", label: "Australian Reptile Park", x: 75, y: 37.6 },
-  { page: 9, label: "Broken Bay Pearl Farm", x: 75, y: 82.2 },
-  { page: 10, label: "Chocolate Factory Gosford", x: 75, y: 37.6 },
-  { page: 10, label: "Central Coast Aero Club", x: 75, y: 82.2 },
-  { page: 11, label: "Glenworth Valley Horse Riding", x: 75, y: 37.6 },
-  { page: 11, label: "Iris Lodge Alpacas", x: 75, y: 82.2 },
-  { page: 12, label: "Treetops Adventure Park", x: 75, y: 37.6 },
-  { page: 12, label: "8 at Trinity", x: 75, y: 82.2 }
+  { page: 3, name: "beachie", label: "The Beachie", xMm: 82.617, yMm: 121.334 },
+  { page: 5, label: "Caves Coastal", xMm: 82.416, yMm: 119.639 },
+  { page: 9, name: "reptile", label: "Australian Reptile Park", xMm: 82.588, yMm: 65.156 },
+  { page: 9, label: "Broken Bay Pearl Farm", xMm: 82.588, yMm: 162.58 },
+  { page: 10, label: "Chocolate Factory Gosford", xMm: 184.088, yMm: 65.156 },
+  { page: 10, label: "Central Coast Aero Club", xMm: 184.088, yMm: 162.58 },
+  { page: 11, label: "Glenworth Valley Horse Riding", xMm: 82.588, yMm: 65.156 },
+  { page: 11, label: "Iris Lodge Alpacas", xMm: 82.588, yMm: 162.58 },
+  { page: 12, label: "Treetops Adventure Park", xMm: 82.588, yMm: 65.156 },
+  { page: 12, label: "8 at Trinity", xMm: 82.588, yMm: 162.58 }
 ];
-const viewButtons = buttonSpecs.map(spec => {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "guide-view-pill";
-  button.style.left = spec.x + "%";
-  button.style.top = spec.y + "%";
-  button.textContent = "View ›";
-  button.setAttribute("aria-label", "View " + spec.label);
-  button.title = spec.name ? "View " + spec.label : spec.label + " profile coming soon";
-  if (!spec.name) {
-    button.disabled = true;
-    button.setAttribute("aria-label", spec.label + " profile coming soon");
-  } else {
-    button.addEventListener("click", event => {
-      event.stopPropagation();
-      openProfile(spec.name);
-    });
+function attachPageButtons(index, sheet) {
+  for (const spec of buttonSpecs.filter(item => item.page === index)) {
+    const localX = spec.xMm - (spec.xMm >= PAGE_W_MM ? PAGE_W_MM : 0);
+    const centerX = localX + X_CALIBRATION_MM;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "guide-view-pill";
+    button.style.left = (((centerX - PILL_W_MM / 2) / PAGE_W_MM) * 100) + "%";
+    button.style.top = (((spec.yMm - PILL_H_MM / 2) / PAGE_H_MM) * 100) + "%";
+    button.style.width = (PILL_W_MM / PAGE_W_MM * 100) + "%";
+    button.style.height = (PILL_H_MM / PAGE_H_MM * 100) + "%";
+    button.textContent = "View ›";
+    button.setAttribute("aria-label", spec.name ? "View " + spec.label : spec.label + " profile coming soon");
+    if (spec.name) {
+      button.addEventListener("click", event => { event.stopPropagation(); openProfile(spec.name); });
+    } else {
+      button.disabled = true;
+      button.title = spec.label + " profile coming soon";
+    }
+    button.addEventListener("pointerdown", event => event.stopPropagation());
+    button.addEventListener("pointerup", event => event.stopPropagation());
+    sheet.append(button);
   }
-  // The swipe listener is on #viewport; avoid pointer capture for a pill tap.
-  button.addEventListener("pointerdown", event => event.stopPropagation());
-  button.addEventListener("pointerup", event => event.stopPropagation());
-  viewport.append(button);
-  return { ...spec, button };
-});
-function updateHotspots() {
-  viewButtons.forEach(({ page, button }) => {
-    button.hidden = activeProfile !== null || current !== page;
-  });
 }
+function updateHotspots() { /* Buttons now travel with each page's artwork. */ }
 function endAnimation(next) {
   current = next;
   animating = false;
