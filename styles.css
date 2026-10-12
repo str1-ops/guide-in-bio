@@ -17,7 +17,7 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 .profile-paper { position: relative; width: var(--page-width); height: var(--page-height); overflow: hidden; background: #fff2dc; color: #607e93; font-family: Georgia, "Times New Roman", serif; }
 .profile-back { position: absolute; left: 7%; top: 5%; display: inline-flex; align-items: center; gap: calc(var(--page-height) * .012); width: auto; height: calc(var(--page-height) * .053); padding: 0; border: 0; background: transparent; color: #607e93; cursor: pointer; z-index: 2; white-space: nowrap; }
 .profile-back svg { display: block; flex: none; width: calc(var(--page-height) * .053); height: calc(var(--page-height) * .053); padding: calc(var(--page-height) * .012); border-radius: calc(var(--page-height) * .008); background: #82402d; color: #fff; }
-.profile-back-label { font: italic 400 calc(var(--page-height) * .020) Georgia, "Times New Roman", serif; letter-spacing: -.01em; }
+.profile-back-label { font: 400 calc(var(--page-height) * .018) Arial, sans-serif; letter-spacing: 0; }
 .profile-content { position: absolute; inset: 19% 4% auto; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .beachie-wordmark { position: relative; width: 68%; height: calc(var(--page-height) * .108); color: #64839b; transform: rotate(-3deg); }
 .wordmark-the { position: absolute; top: 0; left: 35%; font-size: calc(var(--page-height) * .021); font-style: italic; }
