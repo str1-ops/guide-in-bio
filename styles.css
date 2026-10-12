@@ -56,10 +56,7 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 .guide-view-pill {
   position: absolute;
   z-index: 15;
-  transform: translateY(-50%);
-  width: 20.5%;
-  height: 4.2%;
-  min-height: 24px;
+  /* Position and size are calculated from the original InDesign mm geometry. */
   display: flex;
   align-items: center;
   justify-content: center;
