@@ -101,7 +101,7 @@ function commitPageEntry() {
   pageEntryTimer = null;
   const raw = pageInput.value.trim();
   const value = Number(raw);
-  if (/^\\d{1,2}$/.test(raw) && Number.isInteger(value) && value >= 1 && value <= urls.length) {
+  if (/^\d{1,2}$/.test(raw) && Number.isInteger(value) && value >= 1 && value <= urls.length) {
     goToPage(value - 1);
     pageInput.blur();
   } else {
@@ -115,7 +115,7 @@ pageInput.addEventListener("focus", () => {
 pageInput.addEventListener("click", () => pageInput.select());
 pageInput.addEventListener("input", () => {
   clearTimeout(pageEntryTimer);
-  const value = pageInput.value.replace(/\\D/g, "").slice(0, 2);
+  const value = pageInput.value.replace(/\D/g, "").slice(0, 2);
   pageInput.value = value;
   if (!value) return;
   // Two digits are a completed page number; single digits may lead to 10-16.
