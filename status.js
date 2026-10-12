@@ -19,6 +19,68 @@ let controlsOpen = false;
 const CONTROL_HEIGHT = 80;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 // Reusable, researched profiles inserted beside the existing profile sections.
+// Construct the additional business pages before resolving their profile nodes.
+const socialSvgs = {
+  Instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.25"/><circle cx="17.7" cy="6.6" r="1" fill="currentColor" stroke="none"/></svg>',
+  Facebook: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.1 0 2.25.2 2.25.2v2.46H15.2c-1.25 0-1.64.77-1.64 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12Z" fill="currentColor"/></svg>'
+};
+const additionalBusinesses = [
+  ["caves", "Caves Coastal Bar & Bungalows", "caves-logo.png",
+    [["Book a Stay","https://cavescoastal.com.au/stay/"],["Accommodation","https://cavescoastal.com.au/stay/"],["Special Offers","https://cavescoastal.com.au/offers/"],["Directions","https://www.google.com/maps/search/?api=1&query=Caves+Coastal+Caves+Beach"]], []],
+  ["pearl", "Broken Bay Pearl Farm", "pearl-logo.png",
+    [["Book a Tour","https://brokenbaypearlfarm.com.au/our-tours/"],["Tour Experiences","https://brokenbaypearlfarm.com.au/our-tours/"],["Website","https://brokenbaypearlfarm.com.au/"],["Directions","https://www.google.com/maps/search/?api=1&query=Broken+Bay+Pearl+Farm+Mooney+Mooney"]],
+    [["Instagram","https://www.instagram.com/brokenbaypearlfarm/"]]],
+  ["chocolate", "Chocolate Factory Gosford", "chocolate-logo.png",
+    [["Factory Tours","https://chocolatefactorygosford.com.au/chocolate-factory-tours/"],["Chocolate Shop","https://chocolatefactorygosford.com.au/"],["Website","https://chocolatefactorygosford.com.au/"],["Directions","https://www.google.com/maps/search/?api=1&query=6+Jusfrute+Drive+West+Gosford+NSW"]],
+    [["Instagram","https://www.instagram.com/chocolatefactorygosford/"],["Facebook","https://www.facebook.com/chocolatefactorygosford"]]],
+  ["aero", "Central Coast Aero Club", "aero-logo.png",
+    [["Scenic Flights","https://ccac.com.au/joy-flights-and-experiences/"],["Trial Flights","https://ccac.com.au/"],["Website","https://ccac.com.au/"],["Directions","https://www.google.com/maps/search/?api=1&query=Central+Coast+Aero+Club+Warnervale+Airport"]], []],
+  ["glenworth", "Glenworth Valley", "glenworth-logo.png",
+    [["Horse Riding","https://glenworth.com.au/"],["Other Adventures","https://glenworth.com.au/"],["Website","https://glenworth.com.au/"],["Directions","https://www.google.com/maps/search/?api=1&query=69+Cooks+Road+Glenworth+Valley+NSW"]],
+    [["Instagram","https://www.instagram.com/glenworth_valley/"]]],
+  ["iris", "Iris Lodge Alpacas", "iris-logo.png",
+    [["Book Experience","https://www.irislodgealpacas.com/"],["Meet & Greet","https://www.irislodgealpacas.com/alpaca-meet-and-greet"],["Website","https://www.irislodgealpacas.com/"],["Directions","https://www.google.com/maps/search/?api=1&query=33+Dunks+Lane+Jilliby+NSW"]],
+    [["Instagram","https://www.instagram.com/irislodgealpacas/"]]],
+  ["treetops", "Treetops Adventure", "treetops-logo.png",
+    [["Book Adventure","https://treetopsadventure.com.au/location/nsw-central-coast/"],["Tree Ropes","https://treetopsadventure.com.au/location/nsw-central-coast/"],["Park Information","https://treetopsadventure.com.au/location/nsw-central-coast/"],["Directions","https://www.google.com/maps/search/?api=1&query=Treetops+Adventure+Ourimbah"]], []],
+  ["trinity", "8 at Trinity", "trinity-logo.png",
+    [["Book a Table","https://8attrinitypoint.com.au/book/"],["Food Menu","https://8attrinitypoint.com.au/menus/lunch-dinner/"],["Drinks Menu","https://8attrinitypoint.com.au/menus/"],["Directions","https://www.google.com/maps/search/?api=1&query=81+Trinity+Point+Drive+Morisset+Park+NSW"]], []]
+];
+for (const [key, title, logo, actions, socials] of additionalBusinesses) {
+  const section = document.createElement("section");
+  section.id = key + "-profile";
+  section.className = "profile";
+  section.hidden = true;
+  section.setAttribute("aria-label", title + " profile");
+  section.innerHTML = '<div class="profile-paper"><button type="button" class="profile-back" aria-label="Back to the Beachcomber Guide"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18 9 12l6-6"/></svg><span class="profile-back-label">The Beachcomber Guide</span></button><div class="profile-content"><div class="business-logo-frame"><img class="business-logo" decoding="async"></div><h1></h1><nav class="profile-actions"></nav><div class="profile-socials"></div></div></div>';
+  section.querySelector("img").src = "/assets/" + logo;
+  section.querySelector("img").alt = title + " logo";
+  section.querySelector("h1").textContent = title;
+  const navigation = section.querySelector(".profile-actions");
+  navigation.setAttribute("aria-label", title + " links");
+  for (const [i, [label, url]] of actions.entries()) {
+    const a = document.createElement("a");
+    a.className = ["action-food","action-drinks","action-bookings","action-room"][i];
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = label;
+    navigation.append(a);
+  }
+  const socialRow = section.querySelector(".profile-socials");
+  for (const [network,url] of socials) {
+    const a = document.createElement("a");
+    a.className = "social-icon";
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.setAttribute("aria-label",network);
+    a.innerHTML = socialSvgs[network];
+    socialRow.append(a);
+  }
+  root.insertBefore(section, announcer);
+}
+
 const profiles = {
   beachie: { element: document.getElementById("beachie-profile"), path: "/beachcomber/the-beachie", page: 3, title: "The Beachie Bar & Bistro" },
   reptile: { element: document.getElementById("reptile-profile"), path: "/beachcomber/australian-reptile-park", page: 9, title: "Australian Reptile Park" },
