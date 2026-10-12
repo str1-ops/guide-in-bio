@@ -32,6 +32,9 @@ function sizing() {
   frameHeight = frameWidth / pageRatio;
   viewport.style.setProperty("--page-width", `${frameWidth}px`);
   viewport.style.setProperty("--page-height", `${frameHeight}px`);
+  // The independent business profile must receive the same fitted dimensions.
+  root.style.setProperty("--page-width", `${frameWidth}px`);
+  root.style.setProperty("--page-height", `${frameHeight}px`);
   // Fixed layout follows iOS's visible viewport while the browser toolbar moves.
   root.style.width = `${safeWidth}px`;
   root.style.height = `${safeHeight}px`;
