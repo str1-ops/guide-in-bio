@@ -58,7 +58,7 @@ function sheetFor(index) {
       hotspot.className = "pdf-hotspot";
       hotspot.setAttribute("aria-label", index === 3 ? "View The Beachie Bar and Bistro profile" : "View Australian Reptile Park profile");
       // Page 10 contains two listings; target only the upper View pill.
-      hotspot.style.cssText = index === 3 ? "left:74%;top:58.8%;width:22%;height:6%;" : "left:74%;top:29.5%;width:22%;height:5.5%;";
+      hotspot.style.cssText = index === 3 ? "left:74%;top:58.8%;width:22%;height:6%;" : "left:74%;top:35.5%;width:22%;height:5.5%;";
       hotspot.addEventListener("pointerdown", event => event.stopPropagation());
       hotspot.addEventListener("click", event => { event.stopPropagation(); openProfile(index === 3 ? "beachie" : "reptile"); });
       element.append(hotspot);
