@@ -159,45 +159,60 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   white-space: nowrap;
 }
 
-.content-stage {
-  position: relative;
-  display: flex;
+.guide-view { width: 100%; }
+.content-stage { margin-top: clamp(22px, 5.6vw, 34px); }
+
+html[data-view="guide"] .guide-view { display: block; }
+html[data-view="guide"] .profile-view { display: none; }
+html[data-view="expanded"] .guide-view { display: none; }
+html[data-view="expanded"] .profile-view { display: flex; }
+
+/* The profile is a new view in the same document, never a second guide
+   section. It grows to use the space below the compact identity. */
+.profile-view {
   flex: 1;
   flex-direction: column;
-  margin-top: clamp(22px, 5.6vw, 34px);
+  width: 100%;
+  min-height: 0;
 }
 
-.stage-panel { width: 100%; }
-
-html[data-view="guide"] .pearl-business,
-html[data-view="expanded"] .expanded-panel {
-  position: relative;
-  flex: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-html[data-view="guide"] .expanded-panel,
-html[data-view="expanded"] .pearl-business {
-  position: absolute;
-  inset: 0 auto auto 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.expanded-panel {
+.profile-identity {
   display: flex;
   flex-direction: column;
-  min-height: 352px;
+  align-items: center;
+  gap: clamp(11px, 2.5svh, 18px);
+  margin: clamp(16px, 4.7svh, 42px) 0 clamp(12px, 3svh, 25px);
+  text-align: center;
 }
+
+.profile-logo {
+  display: block;
+  width: clamp(78px, 22vw, 106px);
+  height: auto;
+  max-height: 105px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.profile-identity h1 {
+  margin: 0;
+  color: var(--blue);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(20px, 5.7vw, 30px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -.028em;
+  white-space: nowrap;
+}
+
 
 .back-to-guide {
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 35px;
-  margin: -6px 0 10px -5px;
+  min-height: 44px;
+  margin: -6px 0 0 -5px;
   padding: 0 5px;
   border: 0;
   background: transparent;
@@ -209,7 +224,17 @@ html[data-view="expanded"] .pearl-business {
 
 .back-to-guide > span { font-size: 20px; font-weight: 400; }
 
-.hours-details { margin: 0 0 12px; }
+.hours-details { margin: 0 0 clamp(14px, 2.6svh, 22px); }
+
+.profile-view .opening-status {
+  justify-content: center;
+  text-align: center;
+}
+
+.profile-view .hours-panel {
+  width: min(100%, 360px);
+  margin: 5px auto 14px;
+}
 
 .opening-status {
   display: flex;
@@ -277,6 +302,7 @@ html[data-view="expanded"] .pearl-business {
 
 .actions {
   display: grid;
+  width: 100%;
   gap: 8px;
 }
 
@@ -338,6 +364,17 @@ html[data-view="expanded"] .pearl-business {
   .action-secondary:hover { background: #f2e4ca; }
   .social-links a:hover { color: var(--blue); }
   .back-to-guide:hover { color: var(--blue); }
+}
+
+@media (max-height: 690px) {
+  .profile-identity {
+    gap: 10px;
+    margin-top: 14px;
+    margin-bottom: 12px;
+  }
+  .profile-logo { width: 76px; }
+  .hours-details { margin-bottom: 9px; }
+  .social-links { min-height: 54px; padding: 5px 0; }
 }
 
 @media (max-width: 360px) {
