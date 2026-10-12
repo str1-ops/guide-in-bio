@@ -22,6 +22,7 @@
   <body>
     <main class="guide-shell">
       <div class="guide-page">
+        <div class="guide-view" id="guide-view" aria-label="Beachcomber local finds guide">
         <section class="business reptile-business" aria-labelledby="reptile-title">
           <div class="photo-wrap">
             <img
@@ -93,11 +94,26 @@
               </div>
             </div>
           </section>
+          </div>
+        </div>
 
-          <section class="stage-panel expanded-panel" id="reptile-expanded" aria-label="Australian Reptile Park visit information">
+          <section class="profile-view" id="reptile-expanded" aria-labelledby="profile-title">
             <button class="back-to-guide" id="back-to-guide" type="button">
               <span aria-hidden="true">←</span> Back to Guide
             </button>
+
+            <div class="profile-identity">
+              <img
+                class="profile-logo"
+                src="https://cdn.sanity.io/images/vzz04c32/production/fa34c6fb0d1add39dda6e29c40c9413647c39302-1181x1053.jpg?w=220&amp;auto=format"
+                alt="Australian Reptile Park logo"
+                width="1181"
+                height="1053"
+                loading="eager"
+                decoding="async"
+              />
+              <h1 id="profile-title">Australian Reptile Park</h1>
+            </div>
 
             <details class="hours-details" id="opening-hours">
               <summary class="opening-status">
@@ -152,7 +168,6 @@
               </a>
             </nav>
           </section>
-        </div>
       </div>
     </main>
   </body>
