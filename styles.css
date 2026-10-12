@@ -4,14 +4,13 @@
   --blue: #60788d;
   --brown: #724230;
   --ink: #101010;
-  --muted: #574e43;
   --line: #cbb7a0;
 }
 
 * { box-sizing: border-box; }
 
 html {
-  min-width: 320px;
+  min-width: 280px;
   background: var(--paper);
   -webkit-text-size-adjust: 100%;
 }
@@ -27,162 +26,123 @@ body {
 button, a { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; }
 button { font: inherit; }
+
 a:focus-visible, button:focus-visible, summary:focus-visible {
   outline: 2px solid var(--blue);
-  outline-offset: 4px;
+  outline-offset: 3px;
 }
 
-.guide-shell {
-  min-height: 100vh;
-  min-height: 100svh;
-}
-
-/* The default guide and collapsed business profile fit into the visible viewport.
-   The expanded weekly schedule may scroll so every row remains legible. */
-.guide-shell.is-viewport-fitted {
-  height: var(--viewport-height, 100dvh);
-  min-height: 0;
-  overflow: hidden;
+.guide-shell,
+.guide-page {
+  width: 100%;
+  min-height: 100dvh;
 }
 
 .guide-page {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 610px;
-  min-height: 100vh;
-  min-height: 100dvh;
-  margin: 0 auto;
-  padding: clamp(18px, 4.55vw, 28px) clamp(15px, 3.8vw, 23px) max(21px, env(safe-area-inset-bottom, 0px));
-  background: var(--paper);
   opacity: 1;
-  transform: scale(var(--fit-scale, 1));
-  transform-origin: top center;
   transition: opacity 150ms ease;
-  will-change: opacity;
 }
 
-/* Fade the complete printed page, including both photos and all text. */
 .guide-page.is-fading { opacity: 0; }
-
-.photo-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 553 / 317;
-  height: var(--photo-height, auto);
-  background: #e9dcc7;
-}
-
-.business-photo {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border: 0;
-}
-
-.reptile-photo { object-position: center 49%; }
-.pearl-photo { object-position: center 42%; }
-
-.learn-more {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 11px;
-  min-width: 122px;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--brown);
-  border-radius: 1px;
-  background: var(--paper);
-  color: var(--brown);
-  font-size: clamp(11px, 2.4vw, 13px);
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.learn-more .link-arrow { font-size: 17px; font-weight: 400; }
-
-.learn-more:disabled {
-  cursor: default;
-  opacity: 1;
-}
-
-@media (hover: hover) {
-  .learn-more:not(:disabled):hover { background: #eedfc5; }
-}
-
-.business-copy h1,
-.business-copy h2 {
-  margin: clamp(12px, 3vw, 19px) 0 0;
-  color: var(--blue);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(22px, 5.1vw, 31px);
-  font-weight: 600;
-  letter-spacing: -.028em;
-  line-height: 1.12;
-}
-
-.business-copy .description {
-  margin: clamp(9px, 2vw, 13px) 0 0;
-  font-size: clamp(14.5px, 3.27vw, 20px);
-  font-weight: 400;
-  line-height: 1.3;
-  letter-spacing: -.014em;
-}
-
-.business-meta {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 9px;
-  margin-top: clamp(13px, 2.8vw, 20px);
-  color: var(--brown);
-  font-size: clamp(11.5px, 3vw, 19px);
-  font-weight: 700;
-  line-height: 1.12;
-}
-
-.contact-details { min-width: 0; }
-.contact-details p { margin: 0 0 2px; }
-.contact-details span { white-space: nowrap; }
-
-.travel-time {
-  flex: 0 0 auto;
-  margin: 0 0 2px;
-  font-size: clamp(11px, 2.8vw, 18px);
-  white-space: nowrap;
-}
-
-.guide-view {
-  display: flex;
-  flex: 1 0 auto;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.guide-view > .business,
-.content-stage { flex-shrink: 0; }
-.content-stage { margin-top: clamp(22px, 5.6vw, 34px); }
 
 html[data-view="guide"] .guide-view { display: flex; }
 html[data-view="guide"] .profile-view { display: none; }
 html[data-view="expanded"] .guide-view { display: none; }
 html[data-view="expanded"] .profile-view { display: flex; }
 
-/* The profile is a new view in the same document, never a second guide
-   section. It grows to use the space below the compact identity. */
+/* The screenshot is the entire immutable printed page.
+   It is NEVER cropped, stretched, reflowed or reconstructed as HTML. */
+.guide-view {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(8px, env(safe-area-inset-top, 0px)) 10px
+    max(8px, env(safe-area-inset-bottom, 0px));
+  overflow: hidden;
+}
+
+.guide-visual {
+  position: relative;
+  flex: none;
+  width: min(610px, calc(100vw - 20px), calc((100dvh - 20px) * 0.545617));
+  aspect-ratio: 610 / 1118;
+}
+
+.guide-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* The only additions to the physical guide are two overlaid controls.
+   Percent positions refer to the source screenshot's 610 x 1118 canvas.
+   The edge of each control aligns with its photograph's lower right corner. */
+.learn-more {
+  position: absolute;
+  right: 4.75%;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+  min-width: 108px;
+  min-height: 44px;
+  padding: 0 9px;
+  border: 1px solid var(--brown);
+  border-radius: 2px;
+  color: var(--brown);
+  background: var(--paper);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transform: translateY(-100%);
+}
+
+.learn-more span { font-size: 16px; font-weight: 400; }
+.learn-more-reptile { top: 31.04%; }
+.learn-more-pearl { top: 79.96%; }
+
+.learn-more:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
 .profile-view {
-  flex: 1;
   flex-direction: column;
   width: 100%;
-  min-height: 0;
+  max-width: 610px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding:
+    max(18px, env(safe-area-inset-top, 0px))
+    clamp(18px, 5vw, 30px)
+    max(20px, env(safe-area-inset-bottom, 0px));
+}
+
+.back-to-guide {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: var(--brown);
+  color: #fff;
+  cursor: pointer;
+}
+
+.back-to-guide svg {
+  display: block;
+  width: 20px;
+  height: 20px;
 }
 
 .profile-identity {
@@ -212,30 +172,6 @@ html[data-view="expanded"] .profile-view { display: flex; }
   line-height: 1.12;
   letter-spacing: -.028em;
   white-space: nowrap;
-}
-
-
-.back-to-guide {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  flex: 0 0 44px;
-  margin: -6px 0 0 -5px;
-  padding: 0;
-  border: 0;
-  border-radius: 2px;
-  background: var(--brown);
-  color: #fff;
-  cursor: pointer;
-}
-
-.back-to-guide svg {
-  display: block;
-  width: 20px;
-  height: 20px;
 }
 
 .hours-details { margin: 0 0 clamp(14px, 2.6svh, 22px); }
@@ -275,12 +211,7 @@ html[data-view="expanded"] .profile-view { display: flex; }
 
 .status-dot.is-closed { background: #9c8174; }
 
-.chevron {
-  width: 17px;
-  height: 17px;
-  flex: none;
-  margin-left: 2px;
-}
+.chevron { width: 17px; height: 17px; flex: none; margin-left: 2px; }
 .hours-details[open] .chevron { transform: rotate(180deg); }
 
 .hours-panel {
@@ -298,11 +229,8 @@ html[data-view="expanded"] .profile-view { display: flex; }
   text-transform: uppercase;
 }
 
-.hours-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
+.hours-list { margin: 0; padding: 0; list-style: none; }
+
 .hours-list li {
   display: flex;
   justify-content: space-between;
@@ -311,6 +239,7 @@ html[data-view="expanded"] .profile-view { display: flex; }
   font-size: clamp(12px, 2.8vw, 14px);
   line-height: 1.3;
 }
+
 .hours-list li.is-today { font-weight: 700; }
 .hours-note { margin: 7px 0 0; font-size: 11px; }
 
@@ -337,10 +266,7 @@ html[data-view="expanded"] .profile-view { display: flex; }
   text-decoration: none;
 }
 
-.action span:last-child {
-  font-size: 18px;
-  font-weight: 400;
-}
+.action span:last-child { font-size: 18px; font-weight: 400; }
 
 .action-primary {
   color: var(--paper);
@@ -367,40 +293,14 @@ html[data-view="expanded"] .profile-view { display: flex; }
   text-decoration: none;
 }
 
-.social-links svg {
-  display: block;
-  width: 22px;
-  height: 22px;
-}
+.social-links svg { display: block; width: 22px; height: 22px; }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
+  .learn-more:not(:disabled):hover { background: #eedfc5; }
   .action-primary:hover { background: #874f39; }
   .action-secondary:hover { background: #f2e4ca; }
   .social-links a:hover { color: var(--blue); }
   .back-to-guide:hover { background: #874f39; }
-}
-
-/* Save vertical space before scaling photographs or text on short phones. */
-@media (max-height: 780px) {
-  .guide-page {
-    padding-top: max(9px, env(safe-area-inset-top, 0px));
-    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
-  }
-  .guide-view .business-copy h1,
-  .guide-view .business-copy h2 { margin-top: 8px; }
-  .guide-view .business-copy .description {
-    margin-top: 7px;
-    line-height: 1.26;
-  }
-  .guide-view .business-meta { margin-top: 9px; }
-  .guide-view .content-stage { margin-top: 14px; }
-}
-
-@media (min-height: 950px) {
-  .guide-page {
-    padding-top: clamp(25px, 3.2dvh, 44px);
-    padding-bottom: max(26px, env(safe-area-inset-bottom, 0px));
-  }
 }
 
 @media (max-height: 690px) {
@@ -414,13 +314,6 @@ html[data-view="expanded"] .profile-view { display: flex; }
   .social-links { min-height: 54px; padding: 5px 0; }
 }
 
-@media (max-width: 360px) {
-  .business-meta { flex-wrap: wrap; row-gap: 4px; }
-  .travel-time { margin-left: auto; }
-  .learn-more { min-width: 113px; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .guide-page,
-  .chevron { transition: none !important; }
+  .guide-page, .chevron { transition: none !important; }
 }
