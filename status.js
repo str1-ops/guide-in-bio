@@ -9,7 +9,9 @@ const track = document.getElementById("track");
 const announcer = document.getElementById("announcer");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const cache = new Map();
-const MAX_CACHE = 5;
+const MAX_CACHE = 7;
+const renderQueue = [];
+let queuedWorker = false;
 let documentPdf, pageCount = 0, pageRatio = 101.5 / 195, current = 0;
 let frameWidth = 0, frameHeight = 0, renderGeneration = 0, activeAnimation = false;
 let pointer = null, resizeTicket = 0, wheelTime = 0;
@@ -74,7 +76,8 @@ async function render(index) {
     entry.canvas.width = entry.canvas.height = 0;
     entry.canvas = canvas;
     entry.ready = true;
-    page.cleanup();
+    // Leave page resources available for fast repeat renders. The PDF document
+    // and bounded canvas cache manage memory across navigation.
   })().catch(error => { console.error("PDF page rendering failed", index + 1, error); }).finally(() => {
     if (entry.promise === task) entry.promise = null;
   });
@@ -104,15 +107,41 @@ function mount() {
       cache.delete(index);
     }
   }
-  // Current page renders first. Neighbours render in the background.
+  // Render the visible page immediately, then prepare the likely next page.
+  // Use idle time for further pages so heavy transparency does not compete
+  // with the initial first-page paint.
   render(current).then(() => {
-    if (current > 0) render(current - 1);
-    if (current < pageCount - 1) render(current + 1);
+    const near = [current + 1, current - 1].filter(i => i >= 0 && i < pageCount);
+    near.forEach(i => enqueueRender(i));
+    const further = [current + 2, current - 2].filter(i => i >= 0 && i < pageCount);
+    further.forEach(i => enqueueRender(i));
   });
   announce();
 }
+function enqueueRender(index) {
+  if (cache.get(index)?.ready || renderQueue.includes(index)) return;
+  renderQueue.push(index);
+  if (!queuedWorker) {
+    queuedWorker = true;
+    const schedule = window.requestIdleCallback || (callback => setTimeout(callback, 40));
+    schedule(drainRenderQueue, { timeout: 250 });
+  }
+}
+async function drainRenderQueue() {
+  const index = renderQueue.shift();
+  if (index === undefined) { queuedWorker = false; return; }
+  await render(index);
+  const schedule = window.requestIdleCallback || (callback => setTimeout(callback, 40));
+  schedule(drainRenderQueue, { timeout: 250 });
+}
 function animateTo(target) {
   if (activeAnimation || !documentPdf || target < 0 || target >= pageCount || target === current) return;
+  // Only slide into an already rendered page. A heavy soft mask should not
+  // produce a blank panel mid-swipe while the renderer catches up.
+  if (!cache.get(target)?.ready) {
+    render(target).then(() => { if (cache.get(target)?.ready) animateTo(target); });
+    return;
+  }
   activeAnimation = true;
   const direction = target - current;
   const finish = () => {
@@ -161,7 +190,12 @@ function endPointer(event) {
   const enough = Math.abs(dx) > Math.max(35, frameWidth * 0.19) ||
     (Math.abs(dx) > 18 && Math.abs(dx / duration) > 0.55);
   const target = enough ? Math.max(0, Math.min(pageCount - 1, current + (dx < 0 ? 1 : -1))) : current;
-  settle(target === current ? 0 : -Math.sign(target - current) * frameWidth, target);
+  if (target !== current && !cache.get(target)?.ready) {
+    // Hold position until the destination is drawn, retaining the visible page.
+    render(target).then(() => settle(-Math.sign(target - current) * frameWidth, target));
+  } else {
+    settle(target === current ? 0 : -Math.sign(target - current) * frameWidth, target);
+  }
 }
 viewport.addEventListener("pointerup", endPointer);
 viewport.addEventListener("pointercancel", event => {
@@ -207,8 +241,9 @@ document.addEventListener("touchmove", event => { if (event.cancelable) event.pr
     const size = first.getViewport({ scale: 1 });
     pageRatio = size.width / size.height;
     sizing();
-    await render(0);
+    // Mount immediately: the first page is rendered without waiting on other pages.
     mount();
+    await render(0);
     viewport.classList.add("ready");
   } catch (error) {
     console.error("Could not load Beachcomber guide", error);
