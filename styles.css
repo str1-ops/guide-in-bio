@@ -74,3 +74,61 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 .guide-view-pill:disabled { opacity: 1; cursor: default; }
 .guide-view-pill[hidden] { display: none !important; }
 .guide-view-pill:focus-visible { outline: 2px solid #607e93; outline-offset: 2px; }
+
+/* Discreet navigation tray. The publication remains contained above this area. */
+#publication.controls-open { padding-bottom: 80px; }
+.page-controls[hidden] { display: none !important; }
+.page-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  padding: 10px max(12px, env(safe-area-inset-right, 12px)) max(12px, env(safe-area-inset-bottom, 12px)) max(12px, env(safe-area-inset-left, 12px));
+  display: flex;
+  gap: clamp(6px, 2vw, 16px);
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  color: #fdf4e1;
+  font: 400 14px Arial, sans-serif;
+  z-index: 30;
+  touch-action: manipulation;
+}
+.page-nav-arrow, .page-close, .page-go {
+  appearance: none;
+  border: 1px solid #444;
+  background: #171717;
+  color: #fff;
+  border-radius: 6px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0 8px;
+  cursor: pointer;
+}
+.page-nav-arrow { font: 26px/1 Georgia, serif; }
+.page-close { font-size: 22px; }
+.page-go { font-size: 12px; min-width: 38px; }
+.page-nav-arrow:disabled { opacity: .3; cursor: default; }
+.page-jump { display: flex; align-items: center; justify-content: center; gap: 7px; }
+.page-jump label, .page-total { white-space: nowrap; color: #bbb; font-size: 13px; }
+#page-number {
+  width: 44px;
+  height: 40px;
+  padding: 0 3px;
+  text-align: center;
+  background: #151515;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 6px;
+  font: 16px Arial, sans-serif;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+#page-number::-webkit-inner-spin-button, #page-number::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.page-controls :focus-visible { outline: 2px solid #fdf4e1; outline-offset: 2px; }
+@media (max-width: 360px) {
+  .page-controls { gap: 5px; padding-left: 8px; padding-right: 8px; }
+  .page-jump { gap: 4px; }
+  .page-jump label { display: none; }
+}
