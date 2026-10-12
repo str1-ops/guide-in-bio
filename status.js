@@ -2,7 +2,7 @@ import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pd
 
 pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
 
-const PDF_URL = "/Beachcomber-Digital-Guide.pdf";
+const PDF_URL = "/Beachcomber-Digital-Guide-Interactive.pdf";
 const root = document.getElementById("publication");
 const viewport = document.getElementById("viewport");
 const track = document.getElementById("track");
