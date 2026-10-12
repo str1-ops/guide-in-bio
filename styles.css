@@ -37,8 +37,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   min-height: 100svh;
 }
 
-/* Only clip the off-layout box when the complete guide fits visually.
-   The fitting code removes this class for an opened weekly schedule. */
+/* The default guide and collapsed business profile fit into the visible viewport.
+   The expanded weekly schedule may scroll so every row remains legible. */
 .guide-shell.is-viewport-fitted {
   height: var(--viewport-height, 100dvh);
   min-height: 0;
@@ -159,10 +159,19 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   white-space: nowrap;
 }
 
-.guide-view { width: 100%; }
+.guide-view {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.guide-view > .business,
+.content-stage { flex-shrink: 0; }
 .content-stage { margin-top: clamp(22px, 5.6vw, 34px); }
 
-html[data-view="guide"] .guide-view { display: block; }
+html[data-view="guide"] .guide-view { display: flex; }
 html[data-view="guide"] .profile-view { display: none; }
 html[data-view="expanded"] .guide-view { display: none; }
 html[data-view="expanded"] .profile-view { display: flex; }
@@ -369,6 +378,29 @@ html[data-view="expanded"] .profile-view { display: flex; }
   .action-secondary:hover { background: #f2e4ca; }
   .social-links a:hover { color: var(--blue); }
   .back-to-guide:hover { background: #874f39; }
+}
+
+/* Save vertical space before scaling photographs or text on short phones. */
+@media (max-height: 780px) {
+  .guide-page {
+    padding-top: max(9px, env(safe-area-inset-top, 0px));
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  }
+  .guide-view .business-copy h1,
+  .guide-view .business-copy h2 { margin-top: 8px; }
+  .guide-view .business-copy .description {
+    margin-top: 7px;
+    line-height: 1.26;
+  }
+  .guide-view .business-meta { margin-top: 9px; }
+  .guide-view .content-stage { margin-top: 14px; }
+}
+
+@media (min-height: 950px) {
+  .guide-page {
+    padding-top: clamp(25px, 3.2dvh, 44px);
+    padding-bottom: max(26px, env(safe-area-inset-bottom, 0px));
+  }
 }
 
 @media (max-height: 690px) {
