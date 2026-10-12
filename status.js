@@ -7,6 +7,10 @@ const root = document.getElementById("publication");
 const viewport = document.getElementById("viewport");
 const track = document.getElementById("track");
 const announcer = document.getElementById("announcer");
+const profile = document.getElementById("beachie-profile");
+const back = document.getElementById("profile-back");
+const PROFILE_PATH = "/beachcomber/the-beachie";
+let profileOpen = false;
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const cache = new Map();
 const MAX_CACHE = 7;
@@ -41,6 +45,18 @@ function sheetFor(index) {
     element.className = "sheet";
     const canvas = document.createElement("canvas");
     element.append(canvas);
+    // Approximate the printed "View >" pill on PDF page 4.
+    // Coordinates are percentages of the page; nothing is added to the PDF.
+    if (index === 3) {
+      const hotspot = document.createElement("button");
+      hotspot.type = "button";
+      hotspot.className = "pdf-hotspot";
+      hotspot.setAttribute("aria-label", "View The Beachie Bar and Bistro profile");
+      hotspot.style.cssText = "left:74%;top:58.8%;width:22%;height:6%;";
+      hotspot.addEventListener("pointerdown", event => event.stopPropagation());
+      hotspot.addEventListener("click", event => { event.stopPropagation(); showProfile(true); });
+      element.append(hotspot);
+    }
     entry = { element, canvas, ready: false, promise: null, generation: -1 };
     cache.set(index, entry);
   }
@@ -134,8 +150,30 @@ async function drainRenderQueue() {
   const schedule = window.requestIdleCallback || (callback => setTimeout(callback, 40));
   schedule(drainRenderQueue, { timeout: 250 });
 }
+function showProfile(open, updateHistory = true) {
+  if (profileOpen === open) return;
+  profileOpen = open;
+  profile.hidden = !open;
+  viewport.hidden = open;
+  if (open) {
+    if (updateHistory) history.pushState({ profile: "beachie" }, "", PROFILE_PATH);
+    document.title = "The Beachie Bar & Bistro | Beachcomber Guide";
+    back.focus({ preventScroll: true });
+  } else {
+    if (updateHistory) history.pushState({ page: 4 }, "", "/beachcomber");
+    current = 3;
+    document.title = "Beachcomber | Your Pocket Guide";
+    mount();
+    viewport.focus?.({ preventScroll: true });
+  }
+}
+back.addEventListener("click", () => showProfile(false));
+window.addEventListener("popstate", () => {
+  const direct = location.pathname.replace(/\/$/, "") === PROFILE_PATH;
+  showProfile(direct, false);
+});
 function animateTo(target) {
-  if (activeAnimation || !documentPdf || target < 0 || target >= pageCount || target === current) return;
+  if (profileOpen || activeAnimation || !documentPdf || target < 0 || target >= pageCount || target === current) return;
   // Only slide into an already rendered page. A heavy soft mask should not
   // produce a blank panel mid-swipe while the renderer catches up.
   if (!cache.get(target)?.ready) {
@@ -170,7 +208,7 @@ function settle(shift, next) {
   setTimeout(() => { if (activeAnimation) { track.removeEventListener("transitionend", finish); finish(); } }, 350);
 }
 viewport.addEventListener("pointerdown", event => {
-  if (!documentPdf || activeAnimation || pointer || (event.pointerType === "mouse" && event.button !== 0)) return;
+  if (profileOpen || !documentPdf || activeAnimation || pointer || (event.pointerType === "mouse" && event.button !== 0)) return;
   pointer = { id: event.pointerId, startX: event.clientX, startY: event.clientY, startTime: performance.now(), dx: 0 };
   viewport.setPointerCapture(event.pointerId);
 });
@@ -203,12 +241,12 @@ viewport.addEventListener("pointercancel", event => {
   pointer = null; settle(0, current);
 });
 window.addEventListener("keydown", event => {
-  if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+  if (profileOpen || (event.key !== "ArrowRight" && event.key !== "ArrowLeft")) return;
   event.preventDefault();
   animateTo(current + (event.key === "ArrowRight" ? 1 : -1));
 });
 viewport.addEventListener("wheel", event => {
-  if (Math.abs(event.deltaX) <= Math.abs(event.deltaY) || Math.abs(event.deltaX) < 12) return;
+  if (profileOpen || Math.abs(event.deltaX) <= Math.abs(event.deltaY) || Math.abs(event.deltaX) < 12) return;
   event.preventDefault();
   if (performance.now() - wheelTime < 500) return;
   wheelTime = performance.now();
@@ -241,6 +279,11 @@ document.addEventListener("touchmove", event => { if (event.cancelable) event.pr
     const size = first.getViewport({ scale: 1 });
     pageRatio = size.width / size.height;
     sizing();
+    if (location.pathname.replace(/\/$/, "") === PROFILE_PATH) {
+      current = 3;
+      mount();
+      showProfile(true, false);
+    }
     // Mount immediately: the first page is rendered without waiting on other pages.
     mount();
     await render(0);
