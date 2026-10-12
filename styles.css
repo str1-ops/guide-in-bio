@@ -38,3 +38,7 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
 .reptile-emblem { width: calc(var(--page-height) * .075); height: calc(var(--page-height) * .075); border: calc(var(--page-height) * .005) solid #c56c2f; border-radius: 50%; display: grid; place-items: center; color: #3c624d; font: 800 calc(var(--page-height) * .019) Arial, sans-serif; }
 .reptile-brand { font: 800 calc(var(--page-height) * .029) / 1.05 Arial, sans-serif; text-align: left; letter-spacing: -.025em; }
 .reptile-profile .profile-content h1 { font-size: calc(var(--page-height) * .025); }
+
+/* Keep the page-ten link above the swipe track, but invisible. */
+.viewport-hotspot { z-index: 10; }
+.viewport-hotspot[hidden] { display: none !important; }
