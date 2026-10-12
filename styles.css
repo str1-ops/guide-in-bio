@@ -95,7 +95,7 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
   z-index: 30;
   touch-action: manipulation;
 }
-.page-nav-arrow, .page-close, .page-go {
+.page-nav-arrow {
   appearance: none;
   border: 1px solid #444;
   background: #171717;
@@ -107,8 +107,6 @@ body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none
   cursor: pointer;
 }
 .page-nav-arrow { font: 26px/1 Georgia, serif; }
-.page-close { font-size: 22px; }
-.page-go { font-size: 12px; min-width: 38px; }
 .page-nav-arrow:disabled { opacity: .3; cursor: default; }
 .page-jump { display: flex; align-items: center; justify-content: center; gap: 7px; }
 .page-jump label, .page-total { white-space: nowrap; color: #bbb; font-size: 13px; }
