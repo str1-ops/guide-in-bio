@@ -23,3 +23,7 @@ Then visit `http://localhost:8000`. Vercel serves static files without a build s
 ## Further work
 
 Manually test on Safari iOS, Chrome Android, and desktop trackpads. Interactive PDF overlays can later be positioned relative to each `.sheet` without modifying the original PDF.
+
+## Beachie profile prototype
+
+PDF page 4 has an invisible, page-relative View hotspot that opens the separate Beachie Bar & Bistro profile. The profile is outside the 16-page swipe sequence, and its back arrow returns to page 4. Profile action buttons are placeholders only.
