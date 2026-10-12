@@ -73,7 +73,7 @@
     if (window.innerWidth <= 610 && mostContent > viewportHeight) {
       const photoHeight = photo.getBoundingClientRect().height;
       const targetReduction = Math.min(
-        photoHeight * 0.17,
+        photoHeight * 0.22,
         Math.max(0, (mostContent - viewportHeight) / 2)
       );
       page.style.setProperty(
