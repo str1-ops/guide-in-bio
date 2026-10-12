@@ -1,9 +1,11 @@
-/* One guide page, two views. No API, framework, database or business CMS. */
+/* A single printed-style guide with two states, and a full-page fade. */
 (() => {
   "use strict";
 
   const root = document.documentElement;
-  const stage = document.getElementById("content-stage");
+  const shell = document.querySelector(".guide-shell");
+  const page = document.querySelector(".guide-page");
+  const photo = document.querySelector(".reptile-business .photo-wrap");
   const pearlPanel = document.getElementById("pearl-business");
   const expandedPanel = document.getElementById("reptile-expanded");
   const learnButton = document.getElementById("reptile-learn-more");
@@ -16,8 +18,13 @@
 
   const GUIDE_PATH = "/beachcomber";
   const PROFILE_PATH = "/beachcomber/australian-reptile-park";
+  const FADE_OUT_MS = 150;
+  const MIN_READABLE_SCALE = 0.82;
   const isDirectProfile = () => /^\/beachcomber\/australian-reptile-park\/?$/.test(window.location.pathname);
-  let heightTimer;
+
+  let fadeTimer = null;
+  let fitFrame = null;
+  let canFitViewport = false;
 
   function showView(expanded) {
     root.dataset.view = expanded ? "expanded" : "guide";
@@ -31,55 +38,136 @@
       : "Local Finds | Beachcomber Guide";
   }
 
+  // Measure both versions of the same page. Switching data-view here is
+  // synchronous: the browser cannot paint either temporary measurement.
+  function measurePageHeights() {
+    const originalView = root.dataset.view;
+    root.dataset.view = "guide";
+    const guideHeight = page.scrollHeight;
+    root.dataset.view = "expanded";
+    const expandedHeight = page.scrollHeight;
+    root.dataset.view = originalView;
+    return { guideHeight, expandedHeight };
+  }
+
+  function fitGuideToViewport() {
+    const viewportHeight = Math.floor(
+      window.visualViewport ? window.visualViewport.height : window.innerHeight
+    );
+    if (!viewportHeight) return;
+
+    // Measure at natural size, then preserve the printed design's proportions
+    // by uniformly scaling the page only when necessary. On shorter phones
+    // we first trim a little photograph height to retain legible controls.
+    shell.classList.remove("is-viewport-fitted");
+    page.style.removeProperty("--fit-scale");
+    page.style.removeProperty("--photo-height");
+
+    // The weekly hours are additional content: allow scrolling when opened.
+    // Temporarily collapse them for fitting, then restore the user's choice.
+    const hoursWereOpen = hoursDetails.open;
+    hoursDetails.open = false;
+    const natural = measurePageHeights();
+    const mostContent = Math.max(natural.guideHeight, natural.expandedHeight);
+
+    if (window.innerWidth <= 610 && mostContent > viewportHeight) {
+      const photoHeight = photo.getBoundingClientRect().height;
+      const targetReduction = Math.min(
+        photoHeight * 0.17,
+        Math.max(0, (mostContent - viewportHeight) / 2)
+      );
+      page.style.setProperty(
+        "--photo-height",
+        Math.max(128, Math.round(photoHeight - targetReduction)) + "px"
+      );
+    }
+
+    const fitted = measurePageHeights();
+    const requiredHeight = Math.max(fitted.guideHeight, fitted.expandedHeight);
+    const scale = Math.min(1, viewportHeight / Math.max(requiredHeight, 1));
+    canFitViewport = scale >= MIN_READABLE_SCALE;
+
+    if (canFitViewport) {
+      page.style.setProperty("--fit-scale", String(scale));
+      shell.style.setProperty("--viewport-height", viewportHeight + "px");
+    } else {
+      // Do not turn 44px controls into tiny tap targets on very short
+      // screens or under large accessibility text settings.
+      page.style.removeProperty("--fit-scale");
+    }
+
+    hoursDetails.open = hoursWereOpen;
+    shell.classList.toggle("is-viewport-fitted", canFitViewport && !hoursWereOpen);
+  }
+
+  function scheduleFit() {
+    if (fitFrame !== null) window.cancelAnimationFrame(fitFrame);
+    fitFrame = window.requestAnimationFrame(() => {
+      fitFrame = null;
+      fitGuideToViewport();
+    });
+  }
+
+  function commitView(expanded) {
+    showView(expanded);
+    if (!expanded) hoursDetails.open = false;
+    fitGuideToViewport();
+    if (expanded) {
+      backButton.focus({ preventScroll: true });
+    } else {
+      learnButton.focus({ preventScroll: true });
+    }
+  }
+
   function changeView(expanded, updateHistory = true) {
     const currentlyExpanded = root.dataset.view === "expanded";
-    if (expanded === currentlyExpanded) return;
-
-    window.clearTimeout(heightTimer);
-
-    // Hold the existing height before switching panels, then ease into the
-    // natural height of the next view without moving the first business.
-    const oldHeight = stage.getBoundingClientRect().height;
-    stage.style.height = oldHeight + "px";
-    showView(expanded);
-
-    const nextPanel = expanded ? expandedPanel : pearlPanel;
-    const nextHeight = nextPanel.getBoundingClientRect().height;
+    if (fadeTimer !== null) {
+      window.clearTimeout(fadeTimer);
+      fadeTimer = null;
+    }
+    if (expanded === currentlyExpanded) {
+      page.classList.remove("is-fading");
+      return;
+    }
 
     if (updateHistory) {
       window.history.pushState({ expanded }, "", expanded ? PROFILE_PATH : GUIDE_PATH);
     }
 
     if (reduceMotion.matches) {
-      stage.style.height = "";
-    } else {
-      // Start the transition from the explicit previous height.
-      stage.getBoundingClientRect();
-      window.requestAnimationFrame(() => {
-        stage.style.height = nextHeight + "px";
-      });
-      heightTimer = window.setTimeout(() => {
-        stage.style.height = "";
-      }, 330);
+      page.classList.remove("is-fading");
+      commitView(expanded);
+      return;
     }
 
-    if (expanded) {
-      backButton.focus({ preventScroll: true });
-    } else {
-      hoursDetails.open = false;
-      learnButton.focus({ preventScroll: true });
-    }
+    // No sliding or lower-panel crossfade. The ENTIRE page fades out, its
+    // content switches while invisible, then the complete page fades in.
+    page.classList.add("is-fading");
+    fadeTimer = window.setTimeout(() => {
+      fadeTimer = null;
+      commitView(expanded);
+      window.requestAnimationFrame(() => {
+        page.classList.remove("is-fading");
+      });
+    }, FADE_OUT_MS);
   }
 
   showView(isDirectProfile());
+  fitGuideToViewport();
 
   learnButton.addEventListener("click", () => changeView(true));
   backButton.addEventListener("click", () => changeView(false));
 
   window.addEventListener("popstate", () => {
-    const expanded = isDirectProfile();
-    if (expanded === (root.dataset.view === "expanded")) return;
-    changeView(expanded, false);
+    changeView(isDirectProfile(), false);
+  });
+  window.addEventListener("resize", scheduleFit);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", scheduleFit);
+  }
+  hoursDetails.addEventListener("toggle", () => {
+    // Opening all seven rows is an intentional scrollable exception.
+    shell.classList.toggle("is-viewport-fitted", canFitViewport && !hoursDetails.open);
   });
 
   const sydneyClock = new Intl.DateTimeFormat("en-AU", {
